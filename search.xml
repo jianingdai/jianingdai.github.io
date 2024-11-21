@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>this a new post</title>
-      <link href="/2024/11/20/this-a-new-post/"/>
-      <url>/2024/11/20/this-a-new-post/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Hello World</title>
-      <link href="/2024/11/19/hello-world/"/>
-      <url>/2024/11/19/hello-world/</url>
-      
-        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-  
-  
+<search>
+  <entry>
+    <title>UE5引擎源码版编译和Windows版本打包</title>
+    <url>/2024/11/20/UE5%E5%BC%95%E6%93%8E%E6%BA%90%E7%A0%81%E7%89%88%E7%BC%96%E8%AF%91%E5%92%8CWindows%E7%89%88%E6%9C%AC%E6%89%93%E5%8C%85/</url>
+    <content><![CDATA[<h1 id="读前须知"><a href="#读前须知" class="headerlink" title="读前须知"></a>读前须知</h1><hr>
+<p>这里先贴出来<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/downloading-unreal-engine-source-code?application_version=5.4">Unreal Engine</a>的官方安装文档，本人就是跟着官方文档做的。这篇文章作为个人搭建记录和XX公司课程的作业提交。课程中网络相关问题均未提到，如果访问某些网站出现困难那么请自己寻求魔法。</p>
+<h1 id="访问得到Github上的虚幻引擎的源代码"><a href="#访问得到Github上的虚幻引擎的源代码" class="headerlink" title="访问得到Github上的虚幻引擎的源代码"></a>访问得到Github上的虚幻引擎的源代码</h1><ul>
+<li>​	首先就是要有一个<a href="https://github.com/">GitHub</a>账号，没有的话要去注册一个。然后你可以看一下你的账号的profile中的Organizations中有没有epic这个标志，</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121004251563.png" alt="image-20241121004251563"></p>
+<ul>
+<li>​	如果没有这个标志那么可以去<a href="https://www.unrealengine.com/zh-CN">Epic Games</a>登录然后在右上角可以点开自己的头像然后打开账户。要不然的话你点开UnrealEngine的源码仓库会出现访问404。</li>
+</ul>
+<img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121002301539.png" alt="image-20241121002301539" style="zoom:;" />
+
+<ul>
+<li>然后在左面点开应用与账户再点开右面的Github然后选择连接，按照操作进行关联就可以了。然后按照道理来说GitHub会发送邮件邀请你加入GitHub上的@EpicGames组织。你必须在7天内点击邮件内的 加入@EpicGames（Join @EpicGames） 按钮，才能完成GitHub与Epic Games账号的关联流程。但是我<strong>没有</strong>收到这份邮件，这个时候你不要急你等个几分钟然后去<a href="https://github.com/EpicGames">EpicGame的Github主页</a>这个时候你的页面上方应该会有一个消息提示其邀请你加入到Organizations中。如果没看见忘记点了也没事多刷新几次。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121002700384.png" alt="image-20241121002700384"></p>
+<ul>
+<li><p>等你加进组织之后再次访问就不会显示404了。</p>
+<hr>
+</li>
+</ul>
+<h1 id="to-be-continued"><a href="#to-be-continued" class="headerlink" title="to be continued"></a>to be continued</h1>]]></content>
+      <categories>
+        <category>UE5</category>
+      </categories>
+      <tags>
+        <tag>UE5</tag>
+      </tags>
+  </entry>
 </search>
