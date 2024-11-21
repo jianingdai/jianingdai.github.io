@@ -24,7 +24,7 @@
 <h2 id="clone方法"><a href="#clone方法" class="headerlink" title="clone方法"></a>clone方法</h2><p>​	首先要确保你的电脑安装了git，并且你的GitHub上已经绑定了你的本地git的ssh公钥，直接在你想要装Unreal Engine的目录中打开控制台然后输入以下命令</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 1 --branch 5.4 git@github.com:EpicGames/UnrealEngine.git</span><br></pre></td></tr></table></figure>
 
-<h2 id="下载zip压缩包"><a href="#下载zip压缩包" class="headerlink" title="下载zip压缩包"></a>下载zip压缩包</h2><p>​	直接点击我的右面这个连接：<a href="https://github.com/EpicGames/UnrealEngine/releases%EF%BC%8C%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%BF%9B%E5%88%B0UE%E7%9A%84Releases%E7%9A%84%E7%95%8C%E9%9D%A2%E4%BA%86%EF%BC%8C%E7%84%B6%E5%90%8E%E6%89%BE%E5%88%B0%E4%BD%A0%E6%83%B3%E8%A6%81%E4%B8%8B%E8%BD%BD%E7%9A%84%E7%89%88%E6%9C%AC%E7%82%B9%E5%BC%80Assets%E7%82%B9%E5%87%BBSource">https://github.com/EpicGames/UnrealEngine/releases，就可以进到UE的Releases的界面了，然后找到你想要下载的版本点开Assets点击Source</a> code(zip)，msi后缀的是win上的安装包。然后就可以进行下载了，当下载完后直接解压就行。例如像我下图所示（推荐下载有发行版的releases一般来说会比较稳定）：</p>
+<h2 id="下载zip压缩包"><a href="#下载zip压缩包" class="headerlink" title="下载zip压缩包"></a>下载zip压缩包</h2><p>​	直接点击我的右面这个连接：<a href="https://github.com/EpicGames/UnrealEngine/releases">点我</a>，就可以进到UE的Releases的界面了，然后找到你想要下载的版本点开Assets点击Source code(zip)，msi后缀的是win上的安装包。然后就可以进行下载了，当下载完后直接解压就行。例如像我下图所示（推荐下载有发行版的releases一般来说会比较稳定）：</p>
 <p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121132853132.png" alt="image-20241121132853132"></p>
 <p>​	当做到这里的时候你应该已经获得了源码了（差不多有2个GB）。</p>
 <h2 id="下载二进制文件等和开始编译"><a href="#下载二进制文件等和开始编译" class="headerlink" title="下载二进制文件等和开始编译"></a>下载二进制文件等和开始编译</h2><ol>
@@ -41,14 +41,20 @@
 <p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121133941806.png" alt="image-20241121133941806"></p>
 </li>
 </ol>
-<h1 id="创建UE5工程并且开始打包"><a href="#创建UE5工程并且开始打包" class="headerlink" title="创建UE5工程并且开始打包"></a>创建UE5工程并且开始打包</h1><p>​	当你第一次打开UE客户端的时候因为需要进行着色所以的话会很耗时，然后打开客户端进行创建项目，注意以下几个点，项目名称最好别用中文，用英文最好。</p>
+<h1 id="创建UE5工程并且开始打包"><a href="#创建UE5工程并且开始打包" class="headerlink" title="创建UE5工程并且开始打包"></a>创建UE5工程并且开始打包</h1><p>​	当你第一次打开UE客户端的时候因为需要进行着色所以的话会很耗时，然后打开客户端进行创建项目，注意以下几个点，项目名称最好别用中文，最好用英文。</p>
 <p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134504003.png" alt="image-20241121134504003"></p>
 <h2 id="Windows平台打包"><a href="#Windows平台打包" class="headerlink" title="Windows平台打包"></a>Windows平台打包</h2><p>​	然后像下图一样就可以进行游戏的初次打包了：</p>
 <p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134620003.png" alt="image-20241121134620003"></p>
 <h2 id="Android平台打包"><a href="#Android平台打包" class="headerlink" title="Android平台打包"></a>Android平台打包</h2><p>如果想要进行Android平台的打包记得要下载Android Studio进行SDK和NDK的安装，还有就是JAVA的SDK也是需要的一定要注意一下自己有没有安装相关工具链，如果安装成功了应该是我这个样子的：</p>
 <p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134916922.png" alt="image-20241121134916922"></p>
-<p>​	如果没有安装的话可以看一下这个链接：<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine%E8%BF%99%E4%B8%AA%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E6%9C%89%E7%9D%80%E8%AF%A6%E7%BB%86%E7%9A%84%E8%AF%B4%E6%98%8E%E3%80%82">https://dev.epicgames.com/documentation/zh-cn/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine这个官方文档有着详细的说明。</a></p>
-<p>​	本教程目前来说就到这里结束了，如果还有什么问题可以在下面留言评论。</p>
+<p>​	如果没有安装的话可以看一下这个链接：<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine">点我</a>，这个官方文档有着详细的说明。</p>
+<h1 id="打包成果展示"><a href="#打包成果展示" class="headerlink" title="打包成果展示"></a>打包成果展示</h1><p>经过一段时间的编译然后就生成了如下图所示的打包成果：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121174901797.png" alt="image-20241121174901797"></p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121175156226.png" alt="image-20241121175156226"></p>
+<p>实机运行效果如图所示：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121175125192.png" alt="image-20241121175125192"></p>
+<p>​	现在你成功制作了你自己的第一款游戏，具有逼真的物理模拟和极高的画质上限，现在你也可以叫自己为游戏制作工程师了~😍！</p>
+<p>​	本教程到这里就结束了，如果还有什么问题可以在下面留言评论。</p>
 ]]></content>
       <categories>
         <category>UE5</category>
