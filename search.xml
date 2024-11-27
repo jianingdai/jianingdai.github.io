@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>GNN_Learing</title>
+    <url>/2024/11/25/GNN-Learing/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>GNN</category>
+      </categories>
+      <tags>
+        <tag>GNN_Learning</tag>
+        <tag>AI</tag>
+        <tag>图神经网络</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Unreal为例的游戏模式学习</title>
     <url>/2024/11/23/Unreal%E4%B8%BA%E4%BE%8B%E7%9A%84%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F%E5%AD%A6%E4%B9%A0/</url>
     <content><![CDATA[<h1 id="读前须知"><a href="#读前须知" class="headerlink" title="读前须知"></a>读前须知</h1><p>​	在学习这篇笔记之前需要先搭好Unreal Engine的环境，最好是源码版的可以跟着源码一起学习。如果没有相关的环境可以看一下我的这一篇笔记：<a href="/2024/11/20/UE5%E5%BC%95%E6%93%8E%E6%BA%90%E7%A0%81%E7%89%88%E7%BC%96%E8%AF%91%E5%92%8CWindows%E7%89%88%E6%9C%AC%E6%89%93%E5%8C%85/" title="UE5引擎源码版编译和Windows版本打包">UE5引擎源码版编译和Windows版本打包</a></p>
@@ -200,7 +213,94 @@
 </ul>
 </li>
 </ul>
-<h2 id="ACharacter-人型角色"><a href="#ACharacter-人型角色" class="headerlink" title="ACharacter 人型角色"></a>ACharacter 人型角色</h2><h1 id="作业部分："><a href="#作业部分：" class="headerlink" title="作业部分："></a><span id = "作业部分">作业部分：<span></h1>]]></content>
+<h2 id="ACharacter-人型角色"><a href="#ACharacter-人型角色" class="headerlink" title="ACharacter 人型角色"></a>ACharacter 人型角色</h2><ul>
+<li>近似仿真⼈形的胶囊体碰撞盒UCapsuleComponent<ul>
+<li>在保证⼀定真实性的同时，节约性能</li>
+<li>缺点：⽐如脚已经离地但是仍然没掉下去，因为胶囊体还没离开</li>
+</ul>
+</li>
+<li>⻣骼模型USkeletalMeshComponent<ul>
+<li>⽐如射击的时候要知道打到的是头还是脚</li>
+<li>动画蓝图赋予⼈物⽣动表现</li>
+</ul>
+</li>
+<li>⼈物移动组件UCharacterMovementComponent<ol>
+<li>配合胶囊体完成Walking\Falling\Swimming\Flying等多种仿真移动计算</li>
+<li>提供Custom⾃定义移动模式供扩展</li>
+<li>⽹络游戏移动同步架构<ol>
+<li>主控端预表现</li>
+<li>服务器端校验</li>
+<li>模拟端预测<ol>
+<li>match进⾏⼀个差值，减少位置的突变，移动不是⼀帧⼀帧的</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<h1 id="AController和APawn的双向奔赴"><a href="#AController和APawn的双向奔赴" class="headerlink" title="AController和APawn的双向奔赴"></a>AController和APawn的双向奔赴</h1><ul>
+<li>通过Possess和PossessedBy你就是个有主的Pawn了。</li>
+<li>Controller、PlayerState指针赋值</li>
+<li>网络游戏中Role的改变</li>
+</ul>
+<h1 id="AplayerController"><a href="#AplayerController" class="headerlink" title="AplayerController"></a>AplayerController</h1><p>​	<strong>可以理解为提线木偶的操控者</strong></p>
+<ul>
+<li>UInputComponent</li>
+</ul>
+<p>​		绑定输入映射</p>
+<ul>
+<li>APlayerCameraManager</li>
+</ul>
+<p>​		通过ViewTarget上相机臂作⽤后的UCameraComponent计算相机位置</p>
+<ul>
+<li>AHUD (heads-up display) 头显</li>
+</ul>
+<p>​		注意和UI的区别，逐渐被更灵活的UMG取代</p>
+<ul>
+<li>⽹络连接所有权</li>
+</ul>
+<p>​		注意仅在主控端及服务器存在PlayerController</p>
+<h1 id="AGameMode"><a href="#AGameMode" class="headerlink" title="AGameMode"></a>AGameMode</h1><p><strong>这个是真的游戏模式</strong></p>
+<ul>
+<li>仅服务器拥有，掌控整体游戏流程</li>
+<li>定义游戏模式⽤的基础类型</li>
+<li>纯服务器逻辑的操作，如AI</li>
+<li>AGameMode和AGameModeBase区别<ul>
+<li>AGameModeBase，这是所有GameMode的基类，是经典的AGameMode简化版本。</li>
+<li>AGameMode是AGameModeBase的⼦类。AGameMode更适⽤于标准对抗类游戏（如多⼈射击游戏），完善了对局和⽐赛的概念。</li>
+</ul>
+</li>
+</ul>
+<h1 id="AGameState-游戏状态"><a href="#AGameState-游戏状态" class="headerlink" title="AGameState 游戏状态"></a>AGameState 游戏状态</h1><ul>
+<li>所有端都共享同步的游戏数据</li>
+<li>AGameState和AGameStateBase的区别。</li>
+<li>类似AGameMode和AGameModeBase的关系。</li>
+<li>AGameState是AGameStateBase的⼦类。</li>
+<li>AGameMode更适⽤于标准对抗类游戏（如多⼈射击游戏），完善了对局和⽐赛的概念。</li>
+</ul>
+<h1 id="APlayerState玩家状态"><a href="#APlayerState玩家状态" class="headerlink" title="APlayerState玩家状态"></a>APlayerState玩家状态</h1><ul>
+<li>所有端都共享同步的游戏数据</li>
+<li>PlayerState、Character、Controller的职责区别</li>
+</ul>
+<h1 id="作业部分："><a href="#作业部分：" class="headerlink" title="作业部分："></a><span id = "作业部分">作业部分：<span></h1><p>作业是在第一人称设计模板项目中实现以下功能：</p>
+<p>一、物件规则：</p>
+<ul>
+<li>设计命中方块，获得积分X分</li>
+<li>方块被子弹命中后缩放为Y倍，再次被命中后销毁</li>
+</ul>
+<p>二、游戏流程：</p>
+<ol>
+<li>游戏开始时随机N个方块成为“重要目标”，射击命中后获得双倍积分。</li>
+<li>游戏开始后限时T秒，时间到后游戏结算，打印日志输出每个玩家获得的积分和所有玩家获得的总积分</li>
+</ol>
+<p>三、附加题</p>
+<ol>
+<li>利用UMG制作结算UI替代日志打印</li>
+<li>支持多人联机</li>
+</ol>
+<h1 id="一、物件规则："><a href="#一、物件规则：" class="headerlink" title="一、物件规则："></a>一、物件规则：</h1><p>​	</p>
+]]></content>
       <categories>
         <category>UE5</category>
       </categories>
@@ -211,7 +311,8 @@
   <entry>
     <title>UE5引擎源码版编译和Windows版本打包</title>
     <url>/2024/11/20/UE5%E5%BC%95%E6%93%8E%E6%BA%90%E7%A0%81%E7%89%88%E7%BC%96%E8%AF%91%E5%92%8CWindows%E7%89%88%E6%9C%AC%E6%89%93%E5%8C%85/</url>
-    <content><![CDATA[<h1 id="读前须知"><a href="#读前须知" class="headerlink" title="读前须知"></a>读前须知</h1><hr>
+    <content><![CDATA[<p>[TOC]</p>
+<h1 id="读前须知"><a href="#读前须知" class="headerlink" title="读前须知"></a>读前须知</h1><hr>
 <p>​	这里先贴出来<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/downloading-unreal-engine-source-code?application_version=5.4">Unreal Engine</a>的官方安装文档，本人就是跟着官方文档做的。这篇文章作为个人搭建记录和XX公司课程的作业提交。课程中网络相关问题均未提到，如果访问某些网站出现困难那么请自己寻求魔法。本文章目前只有windows版本的教程，mac和Linux的教程在我文章中提到的官方文档里均有提到。</p>
 <h1 id="访问得到Github上的虚幻引擎的源代码"><a href="#访问得到Github上的虚幻引擎的源代码" class="headerlink" title="访问得到Github上的虚幻引擎的源代码"></a>访问得到Github上的虚幻引擎的源代码</h1><p>​	首先就是要有一个<a href="https://github.com/">GitHub</a>账号，没有的话要去注册一个。然后你可以看一下你的账号的profile中的Organizations中有没有epic这个标志，</p>
 <p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121004251563.png" alt="image-20241121004251563"></p>
