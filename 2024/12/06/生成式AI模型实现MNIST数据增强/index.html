@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/cat.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/cat.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/cat.png">
+  <link rel="mask-icon" href="/images/cat.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha256-5eIC48iZUHmSlSUz9XtjRyK2mzQkHScZY1WdMaoz74E=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jianingdai.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文主要是作为我本身的结课的作业的一种提交形式。内容主要包括使用生成式AI模型实现MNIST数据增强。选用CGAN、VAE等生成式AI模型。在深度学习框架PyTorch上基于MNIST训练集优化所选生成式AI模型。基于定量性能指标：[分类准确率]对比无数据增强、有数据增强技术路线性能。并且对所选生成式AI模型分析其数据增强的效果差异并进行对比分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="生成式AI模型实现MNIST数据增强">
+<meta property="og:url" content="http://jianingdai.github.io/2024/12/06/%E7%94%9F%E6%88%90%E5%BC%8FAI%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0MNIST%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/index.html">
+<meta property="og:site_name" content="小代爱学习">
+<meta property="og:description" content="本文主要是作为我本身的结课的作业的一种提交形式。内容主要包括使用生成式AI模型实现MNIST数据增强。选用CGAN、VAE等生成式AI模型。在深度学习框架PyTorch上基于MNIST训练集优化所选生成式AI模型。基于定量性能指标：[分类准确率]对比无数据增强、有数据增强技术路线性能。并且对所选生成式AI模型分析其数据增强的效果差异并进行对比分析。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412061423492.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412121937255.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412122335686.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412122336984.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412122341083.png">
+<meta property="article:published_time" content="2024-12-06T05:43:31.000Z">
+<meta property="article:modified_time" content="2024-12-13T02:15:10.625Z">
+<meta property="article:author" content="jianing dai">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="VAE">
+<meta property="article:tag" content="LeNet">
+<meta property="article:tag" content="GenAI">
+<meta property="article:tag" content="CGAN">
+<meta property="article:tag" content="GAN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412061423492.png">
+
+
+<link rel="canonical" href="http://jianingdai.github.io/2024/12/06/%E7%94%9F%E6%88%90%E5%BC%8FAI%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0MNIST%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jianingdai.github.io/2024/12/06/%E7%94%9F%E6%88%90%E5%BC%8FAI%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0MNIST%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/","path":"2024/12/06/生成式AI模型实现MNIST数据增强/","title":"生成式AI模型实现MNIST数据增强"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>生成式AI模型实现MNIST数据增强 | 小代爱学习</title>
+  
+
+  <script src="/js/third-party/analytics/baidu-analytics.js"></script>
+  <script async src="https://hm.baidu.com/hm.js?b765f5fe044fded4f27d9306bd7367a2"></script>
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">小代爱学习</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>个人主页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa-solid fa-inbox fa-fw"></i>所有文章</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E6%A1%A3%E8%AF%B4%E6%98%8E%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">文档说明：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VAE%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA%E5%AE%9E%E7%8E%B0%E9%83%A8%E5%88%86%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">VAE数据增强实现部分：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VAE%E8%AE%AD%E7%BB%83%E4%BB%A3%E7%A0%81train-vae-py%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">VAE训练代码train_vae.py：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E9%A1%B9%EF%BC%9A"><span class="nav-number">2.1.1.</span> <span class="nav-text">依赖项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VAE%E6%A8%A1%E5%9E%8B%EF%BC%9A"><span class="nav-number">2.1.2.</span> <span class="nav-text">VAE模型：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E5%99%A8%EF%BC%9A"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">编码器：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E7%A0%81%E5%99%A8%EF%BC%9A"><span class="nav-number">2.1.2.2.</span> <span class="nav-text">解码器：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E5%8F%82%E6%95%B0%E5%8C%96%E6%8A%80%E5%B7%A7%EF%BC%9A"><span class="nav-number">2.1.2.3.</span> <span class="nav-text">重参数化技巧：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="nav-number">2.1.3.</span> <span class="nav-text">损失函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%EF%BC%9A"><span class="nav-number">2.1.4.</span> <span class="nav-text">训练：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="nav-number">2.1.5.</span> <span class="nav-text">代码：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VAE%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81generate-vae-py"><span class="nav-number">2.2.</span> <span class="nav-text">VAE生成代码generate_vae.py:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E9%A1%B9%EF%BC%9A-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">依赖项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#VAE%E6%A8%A1%E5%9E%8B%EF%BC%9A-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">VAE模型：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E5%99%A8%EF%BC%9A-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">编码器：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E7%A0%81%E5%99%A8%EF%BC%9A-1"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">解码器：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E5%8F%82%E6%95%B0%E5%8C%96%E6%8A%80%E5%B7%A7%EF%BC%9A-1"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">重参数化技巧：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E5%A2%9E%E5%BC%BA%E6%95%B0%E6%8D%AE%E9%9B%86%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">2.2.3.</span> <span class="nav-text">保存增强数据集方法：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%AD%A5%E9%AA%A4%EF%BC%9A"><span class="nav-number">2.2.4.</span> <span class="nav-text">主要步骤：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%EF%BC%9A-1"><span class="nav-number">2.2.5.</span> <span class="nav-text">代码：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CGAN%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA%E5%AE%9E%E7%8E%B0%E9%83%A8%E5%88%86%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">CGAN数据增强实现部分：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CGAN%E8%AE%AD%E7%BB%83%E4%BB%A3%E7%A0%81train-gan-py"><span class="nav-number">3.1.</span> <span class="nav-text">CGAN训练代码train_gan.py:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E9%A1%B9%EF%BC%9A-2"><span class="nav-number">3.1.1.</span> <span class="nav-text">依赖项：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CGAN%E6%A8%A1%E5%9E%8B%EF%BC%9A"><span class="nav-number">3.1.2.</span> <span class="nav-text">CGAN模型：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E5%99%A8%E8%AE%BE%E8%AE%A1%EF%BC%88Generator%EF%BC%89"><span class="nav-number">3.1.2.1.</span> <span class="nav-text">生成器设计（Generator）:</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B5%8C%E5%85%A5%E5%B1%82%EF%BC%9A"><span class="nav-number">3.1.2.1.1.</span> <span class="nav-text">嵌入层：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%EF%BC%9A"><span class="nav-number">3.1.2.1.2.</span> <span class="nav-text">全连接层：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%B1%82%EF%BC%9A"><span class="nav-number">3.1.2.1.3.</span> <span class="nav-text">卷积层：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A4%E5%88%AB%E5%99%A8%E8%AE%BE%E8%AE%A1%EF%BC%88Discriminator%EF%BC%89%EF%BC%9A"><span class="nav-number">3.1.2.2.</span> <span class="nav-text">判别器设计（Discriminator）：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B5%8C%E5%85%A5%E5%B1%82%EF%BC%9A-1"><span class="nav-number">3.1.2.2.1.</span> <span class="nav-text">嵌入层：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%B1%82%EF%BC%9A-1"><span class="nav-number">3.1.2.2.2.</span> <span class="nav-text">卷积层：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%EF%BC%9A-1"><span class="nav-number">3.1.2.2.3.</span> <span class="nav-text">全连接层：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%EF%BC%9A-1"><span class="nav-number">3.1.3.</span> <span class="nav-text">损失函数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%EF%BC%9A-1"><span class="nav-number">3.1.4.</span> <span class="nav-text">训练：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%EF%BC%9A-2"><span class="nav-number">3.1.5.</span> <span class="nav-text">代码：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CGAN%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81generator-GAN-py%EF%BC%9A"><span class="nav-number">3.2.</span> <span class="nav-text">CGAN生成代码generator_GAN.py：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96%E9%A1%B9"><span class="nav-number">3.2.1.</span> <span class="nav-text">依赖项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CGAN%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.2.</span> <span class="nav-text">CGAN模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E6%95%B0%E6%8D%AE%E9%9B%86%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.3.</span> <span class="nav-text">保存数据集的方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.2.4.</span> <span class="nav-text">主要步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">3.2.5.</span> <span class="nav-text">代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%95%B0%E6%8D%AE%E9%9B%86%E5%8F%AF%E8%A7%86%E5%8C%96%E5%AF%B9%E6%AF%94%E5%B1%95%E7%A4%BA%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">三种数据集可视化对比展示：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%A7%8BMNIST%E6%95%B0%E6%8D%AE%E9%9B%86%E5%B1%95%E7%A4%BA%E5%9B%BE%EF%BC%9A"><span class="nav-number">4.1.</span> <span class="nav-text">原始MNIST数据集展示图：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VAE%E5%A2%9E%E5%BC%BA%E6%95%B0%E6%8D%AE%E9%9B%86%E5%B1%95%E7%A4%BA%E5%9B%BE%EF%BC%9A"><span class="nav-number">4.2.</span> <span class="nav-text">VAE增强数据集展示图：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CGAN%E5%A2%9E%E5%BC%BA%E6%95%B0%E6%8D%AE%E9%9B%86%E5%B1%95%E7%A4%BA%E5%9B%BE%EF%BC%9A"><span class="nav-number">4.3.</span> <span class="nav-text">CGAN增强数据集展示图：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E5%88%AB%E7%94%A8%E4%B8%89%E7%A7%8D%E6%95%B0%E6%8D%AE%E9%9B%86%E8%AE%AD%E7%BB%83%E5%88%86%E7%B1%BB%E6%A8%A1%E5%9E%8B%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">分别用三种数据集训练分类模型：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E6%A8%A1%E5%9E%8B%E9%80%89%E6%8B%A9%EF%BC%9ALeNet5"><span class="nav-number">5.1.</span> <span class="nav-text">分类模型选择：LeNet5</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LeNet5-%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.1.1.</span> <span class="nav-text">LeNet5 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E5%90%91%E4%BC%A0%E6%92%AD%E8%BF%87%E7%A8%8B"><span class="nav-number">5.1.2.</span> <span class="nav-text">前向传播过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B%EF%BC%9A"><span class="nav-number">5.1.3.</span> <span class="nav-text">类代码如下：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%E5%92%8C%E4%BC%98%E5%8C%96%E5%99%A8%EF%BC%9A"><span class="nav-number">5.2.</span> <span class="nav-text">损失函数和优化器：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%EF%BC%9A-3"><span class="nav-number">5.3.</span> <span class="nav-text">代码：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%88%E6%9E%9C%E5%AF%B9%E6%AF%94"><span class="nav-number">6.</span> <span class="nav-text">效果对比</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C%E5%88%86%E6%9E%90"><span class="nav-number">7.</span> <span class="nav-text">结果分析</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="jianing dai"
+      src="/images/cat.png">
+  <p class="site-author-name" itemprop="name">jianing dai</p>
+  <div class="site-description" itemprop="description">Hello World! :)</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jianingdai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jianingdai" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:jianing.dai@whu.edu.cn" title="E-Mail → mailto:jianing.dai@whu.edu.cn" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jianingdai.github.io/2024/12/06/%E7%94%9F%E6%88%90%E5%BC%8FAI%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0MNIST%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cat.png">
+      <meta itemprop="name" content="jianing dai">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小代爱学习">
+      <meta itemprop="description" content="Hello World! :)">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="生成式AI模型实现MNIST数据增强 | 小代爱学习">
+      <meta itemprop="description" content="本文主要是作为我本身的结课的作业的一种提交形式。内容主要包括使用生成式AI模型实现MNIST数据增强。选用CGAN、VAE等生成式AI模型。在深度学习框架PyTorch上基于MNIST训练集优化所选生成式AI模型。基于定量性能指标：[分类准确率]对比无数据增强、有数据增强技术路线性能。并且对所选生成式AI模型分析其数据增强的效果差异并进行对比分析。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          生成式AI模型实现MNIST数据增强
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">提交于</span>
+
+      <time title="创建时间：2024-12-06 13:43:31" itemprop="dateCreated datePublished" datetime="2024-12-06T13:43:31+08:00">2024-12-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-13 10:15:10" itemprop="dateModified" datetime="2024-12-13T10:15:10+08:00">2024-12-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI/GenAI/" itemprop="url" rel="index"><span itemprop="name">GenAI</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2024/12/06/%E7%94%9F%E6%88%90%E5%BC%8FAI%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0MNIST%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2024/12/06/生成式AI模型实现MNIST数据增强/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+</div>
+
+            <div class="post-description">本文主要是作为我本身的结课的作业的一种提交形式。内容主要包括使用生成式AI模型实现MNIST数据增强。选用CGAN、VAE等生成式AI模型。在深度学习框架PyTorch上基于MNIST训练集优化所选生成式AI模型。基于定量性能指标：[分类准确率]对比无数据增强、有数据增强技术路线性能。并且对所选生成式AI模型分析其数据增强的效果差异并进行对比分析。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="文档说明："><a href="#文档说明：" class="headerlink" title="文档说明："></a>文档说明：</h1><p>​	本文主要是作为我本身的结课的作业的一种提交形式。内容主要包括使用生成式AI模型实现MNIST数据增强。选用cGAN、VAE等生成式AI模型。在深度学习框架PyTorch上基于MNIST训练集优化所选生成式AI模型。基于定量性能指标：[分类准确率]对比无数据增强、有数据增强技术路线性能。并且对所选生成式AI模型分析其数据增强的效果差异并进行对比分析。</p>
+<p>​	流程图如：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412061423492.png" alt="image-20241206142328369"></p>
+<h1 id="VAE数据增强实现部分："><a href="#VAE数据增强实现部分：" class="headerlink" title="VAE数据增强实现部分："></a>VAE数据增强实现部分：</h1><p>​	VAE数据增强部分，我这里是分成了两个脚本文件来进行操作，其中一个文件是<code>train_vae.py</code>，这个文件主要是为了训练vae模型。然后还有一个文件，名字是<code>generate_vae.py</code>，该文件主要是利用训练好的vae模型对MNIST数据集进行数据增强，我这里是将MNIST的训练集中的每个样本图片都进行了重参数化（reparameterize）然后输入到Decoder中生成对应的数据样本，同时也是方便我获取生成样本的标签，这是因为VAE模型的Decoder是从潜在空间中生成的样本，本质上是无标签的，所以我要利用原样本的标签和其在潜在空间中的值，这会帮助我生成增强数据集。</p>
+<h2 id="VAE训练代码train-vae-py："><a href="#VAE训练代码train-vae-py：" class="headerlink" title="VAE训练代码train_vae.py："></a>VAE训练代码<code>train_vae.py</code>：</h2><p>以下是我的<code>homeWork/train_vae.py</code>文件的说明：</p>
+<p>该脚本在MNIST数据集上训练变分自编码器（VAE）。</p>
+<h3 id="依赖项："><a href="#依赖项：" class="headerlink" title="依赖项："></a>依赖项：</h3><ul>
+<li><code>torch</code></li>
+<li><code>torch.nn</code></li>
+<li><code>torch.optim</code></li>
+<li><code>torch.utils.data</code></li>
+<li><code>torchvision.datasets</code></li>
+<li><code>torchvision.transforms</code></li>
+</ul>
+<h3 id="VAE模型："><a href="#VAE模型：" class="headerlink" title="VAE模型："></a>VAE模型：</h3><p>VAE模型由编码器和解码器组成。编码器将输入数据压缩到潜在空间表示，解码器从该表示中重构数据。</p>
+<h4 id="编码器："><a href="#编码器：" class="headerlink" title="编码器："></a>编码器：</h4><ul>
+<li><strong>输入</strong>：784维向量（展平的28x28图像）</li>
+<li><strong>输出</strong>：两个20维向量（均值和对数方差）</li>
+</ul>
+<h4 id="解码器："><a href="#解码器：" class="headerlink" title="解码器："></a>解码器：</h4><ul>
+<li><strong>输入</strong>：20维潜在向量</li>
+<li><strong>输出</strong>：784维向量（重构的图像）</li>
+</ul>
+<h4 id="重参数化技巧："><a href="#重参数化技巧：" class="headerlink" title="重参数化技巧："></a>重参数化技巧：</h4><p>为了允许通过随机采样过程进行反向传播，使用重参数化技巧：$ z &#x3D; \mu + \epsilon \cdot \sigma\  $其中$\epsilon$是从标准正态分布中采样。</p>
+<h3 id="损失函数："><a href="#损失函数：" class="headerlink" title="损失函数："></a>损失函数：</h3><p>VAE的损失函数由重构损失和KL散度组成：</p>
+<ul>
+<li><strong>重构损失</strong>：衡量重构图像与原始图像的匹配程度。</li>
+<li><strong>KL散度</strong>：衡量潜在空间分布与标准正态分布的接近程度。</li>
+</ul>
+<h3 id="训练："><a href="#训练：" class="headerlink" title="训练："></a>训练：</h3><ol>
+<li>加载MNIST数据集。</li>
+<li>初始化VAE模型和优化器。</li>
+<li>训练模型若干个epoch，更新模型参数以最小化损失函数。</li>
+<li>将训练好的模型保存到文件。</li>
+</ol>
+<h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets, transforms</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义VAE模型</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">VAE</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, latent_dim=<span class="number">20</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(VAE, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.encoder = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="number">784</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">256</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">256</span>, <span class="number">2</span> * latent_dim)  <span class="comment"># 输出均值和对数方差</span></span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.decoder = nn.Sequential(</span><br><span class="line">            nn.Linear(latent_dim, <span class="number">256</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">256</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">784</span>),</span><br><span class="line">            nn.Sigmoid()  <span class="comment"># 输出值范围在[0, 1]</span></span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.latent_dim = latent_dim</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">encode</span>(<span class="params">self, x</span>):</span><br><span class="line">        h = <span class="variable language_">self</span>.encoder(x)</span><br><span class="line">        mu, log_var = h.chunk(<span class="number">2</span>, dim=-<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> mu, log_var</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">reparameterize</span>(<span class="params">self, mu, log_var</span>):</span><br><span class="line">        std = torch.exp(<span class="number">0.5</span> * log_var)</span><br><span class="line">        eps = torch.randn_like(std)</span><br><span class="line">        <span class="keyword">return</span> mu + eps * std</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">decode</span>(<span class="params">self, z</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.decoder(z)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        mu, log_var = <span class="variable language_">self</span>.encode(x.view(-<span class="number">1</span>, <span class="number">784</span>))</span><br><span class="line">        z = <span class="variable language_">self</span>.reparameterize(mu, log_var)</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.decode(z), mu, log_var</span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义损失函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">vae_loss</span>(<span class="params">recon_x, x, mu, log_var</span>):</span><br><span class="line">    recon_loss = nn.functional.binary_cross_entropy(recon_x, x.view(-<span class="number">1</span>, <span class="number">784</span>), reduction=<span class="string">&#x27;sum&#x27;</span>)</span><br><span class="line">    kl_divergence = -<span class="number">0.5</span> * torch.<span class="built_in">sum</span>(<span class="number">1</span> + log_var - mu.<span class="built_in">pow</span>(<span class="number">2</span>) - log_var.exp())</span><br><span class="line">    <span class="keyword">return</span> recon_loss + kl_divergence, recon_loss, kl_divergence</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 加载MNIST数据</span></span><br><span class="line">    transform = transforms.ToTensor()</span><br><span class="line">    mnist_train = datasets.MNIST(root=<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">True</span>, transform=transform, download=<span class="literal">True</span>)</span><br><span class="line">    mnist_loader = DataLoader(mnist_train, batch_size=<span class="number">128</span>, shuffle=<span class="literal">True</span>, num_workers=<span class="number">4</span>, pin_memory=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 初始化模型与优化器</span></span><br><span class="line">    latent_dim = <span class="number">20</span></span><br><span class="line">    vae = VAE(latent_dim=latent_dim).to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line">    optimizer = optim.Adam(vae.parameters(), lr=<span class="number">1e-3</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        vae.load_state_dict(torch.load(<span class="string">&#x27;vae_gen_mnist.pth&#x27;</span>, weights_only=<span class="literal">True</span>))</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Model loaded successfully.&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Model file not found. Initializing model with random weights.&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 训练VAE模型</span></span><br><span class="line">    epochs = <span class="number">150</span></span><br><span class="line">    vae.train()</span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">        train_loss = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> x, _ <span class="keyword">in</span> mnist_loader:</span><br><span class="line">            x = x.to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line">            optimizer.zero_grad()</span><br><span class="line">            recon_x, mu, log_var = vae(x)</span><br><span class="line">            loss, recon_loss, kl_divergence = vae_loss(recon_x, x, mu, log_var)</span><br><span class="line">            loss.backward()</span><br><span class="line">            train_loss += loss.item()</span><br><span class="line">            optimizer.step()</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Epoch <span class="subst">&#123;epoch + <span class="number">1</span>&#125;</span>, Total Loss: <span class="subst">&#123;train_loss / <span class="built_in">len</span>(mnist_loader.dataset):<span class="number">.4</span>f&#125;</span>, &quot;</span></span><br><span class="line">              <span class="string">f&quot;Reconstruction Loss: <span class="subst">&#123;recon_loss.item() / <span class="built_in">len</span>(mnist_loader.dataset):<span class="number">.4</span>f&#125;</span>, &quot;</span></span><br><span class="line">              <span class="string">f&quot;KL Divergence: <span class="subst">&#123;kl_divergence.item() / <span class="built_in">len</span>(mnist_loader.dataset):<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 保存训练好的模型</span></span><br><span class="line">    torch.save(vae.state_dict(), <span class="string">&#x27;vae_gen_mnist.pth&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="VAE生成代码generate-vae-py"><a href="#VAE生成代码generate-vae-py" class="headerlink" title="VAE生成代码generate_vae.py:"></a>VAE生成代码<code>generate_vae.py</code>:</h2><p>该脚本使用预训练的变分自编码器（VAE）生成MNIST数据集的样本，并将生成的样本保存为<code>.ubyte</code>文件格式。</p>
+<h3 id="依赖项：-1"><a href="#依赖项：-1" class="headerlink" title="依赖项："></a>依赖项：</h3><ul>
+<li><code>torch</code></li>
+<li><code>torch.nn</code></li>
+<li><code>numpy</code></li>
+<li><code>matplotlib.pyplot</code></li>
+<li><code>torch.utils.data</code></li>
+<li><code>torchvision.datasets</code></li>
+<li><code>torchvision.transforms</code></li>
+<li><code>torchvision.utils</code></li>
+<li><code>struct</code></li>
+</ul>
+<h3 id="VAE模型：-1"><a href="#VAE模型：-1" class="headerlink" title="VAE模型："></a>VAE模型：</h3><p>VAE模型由编码器和解码器组成。编码器将输入数据压缩到潜在空间表示，解码器从该表示中重构数据。</p>
+<h4 id="编码器：-1"><a href="#编码器：-1" class="headerlink" title="编码器："></a>编码器：</h4><ul>
+<li><strong>输入</strong>：784维向量（展平的28x28图像）</li>
+<li><strong>输出</strong>：两个20维向量（均值和对数方差）</li>
+</ul>
+<h4 id="解码器：-1"><a href="#解码器：-1" class="headerlink" title="解码器："></a>解码器：</h4><ul>
+<li><strong>输入</strong>：20维潜在向量</li>
+<li><strong>输出</strong>：784维向量（重构的图像）</li>
+</ul>
+<h4 id="重参数化技巧：-1"><a href="#重参数化技巧：-1" class="headerlink" title="重参数化技巧："></a>重参数化技巧：</h4><p>为了允许通过随机采样过程进行反向传播，使用重参数化技巧：$z &#x3D; \mu + \epsilon \cdot \sigma$ 其中$\epsilon$是从标准正态分布中采样。</p>
+<h3 id="保存增强数据集方法："><a href="#保存增强数据集方法：" class="headerlink" title="保存增强数据集方法："></a>保存增强数据集方法：</h3><p><code>save_dataset(images_filepath, labels_filepath, dataset)</code>函数将生成的图像和标签保存为<code>.ubyte</code>文件格式。</p>
+<ul>
+<li><strong>参数</strong>：<ul>
+<li><code>images_filepath</code>：图像文件路径</li>
+<li><code>labels_filepath</code>：标签文件路径</li>
+<li><code>dataset</code>：包含图像和标签的列表</li>
+</ul>
+</li>
+</ul>
+<h3 id="主要步骤："><a href="#主要步骤：" class="headerlink" title="主要步骤："></a>主要步骤：</h3><ol>
+<li>定义VAE模型。</li>
+<li>尝试加载预训练（如果有）的VAE模型权重。</li>
+<li>加载MNIST数据集。</li>
+<li>使用VAE生成样本。</li>
+<li>将生成的样本保存为<code>VAE-Generated-images-idx3-ubyte</code>文件和<code>VAE-Generated-labels-idx1-ubyte</code>。</li>
+</ol>
+<h3 id="代码：-1"><a href="#代码：-1" class="headerlink" title="代码："></a>代码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets, transforms</span><br><span class="line"><span class="keyword">from</span> torchvision.utils <span class="keyword">import</span> make_grid</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 定义VAE模型 ========================</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">VAE</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, latent_dim=<span class="number">20</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(VAE, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.encoder = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="number">784</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">256</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">256</span>, <span class="number">2</span> * latent_dim)  <span class="comment"># 输出均值和对数方差</span></span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.decoder = nn.Sequential(</span><br><span class="line">            nn.Linear(latent_dim, <span class="number">256</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">256</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">784</span>),</span><br><span class="line">            nn.Sigmoid()  <span class="comment"># 输出值范围在[0, 1]</span></span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.latent_dim = latent_dim</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">encode</span>(<span class="params">self, x</span>):</span><br><span class="line">        h = <span class="variable language_">self</span>.encoder(x)</span><br><span class="line">        mu, log_var = h.chunk(<span class="number">2</span>, dim=-<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> mu, log_var</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">reparameterize</span>(<span class="params">self, mu, log_var</span>):</span><br><span class="line">        std = torch.exp(<span class="number">0.5</span> * log_var)</span><br><span class="line">        eps = torch.randn_like(std)</span><br><span class="line">        <span class="keyword">return</span> mu + eps * std</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">decode</span>(<span class="params">self, z</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.decoder(z)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        mu, log_var = <span class="variable language_">self</span>.encode(x.view(-<span class="number">1</span>, <span class="number">784</span>))</span><br><span class="line">        z = <span class="variable language_">self</span>.reparameterize(mu, log_var)</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>.decode(z), mu, log_var</span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 保存增强数据集方法 ========================</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">save_dataset</span>(<span class="params">images_filepath, labels_filepath, dataset</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;保存合并后的数据集到 .ubyte 文件&quot;&quot;&quot;</span></span><br><span class="line">    images = []</span><br><span class="line">    labels = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> image, label <span class="keyword">in</span> dataset:</span><br><span class="line">        images.append(image.numpy())</span><br><span class="line">        labels.append(label)</span><br><span class="line"></span><br><span class="line">    images = np.stack(images).astype(np.uint8)  <span class="comment"># 转为 [N, 28, 28] 的 uint8 数组</span></span><br><span class="line">    labels = np.array(labels, dtype=np.uint8)  <span class="comment"># 转为 uint8 的标签</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Labels before saving: <span class="subst">&#123;labels.shape&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Unique labels before saving: <span class="subst">&#123;np.unique(labels)&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 写入图像文件</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(images_filepath, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(struct.pack(<span class="string">&#x27;&gt;IIII&#x27;</span>, <span class="number">2051</span>, <span class="built_in">len</span>(images), <span class="number">28</span>, <span class="number">28</span>))  <span class="comment"># Magic number 2051 for images</span></span><br><span class="line">        f.write(images.tobytes())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 写入标签文件</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(labels_filepath, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(struct.pack(<span class="string">&#x27;&gt;II&#x27;</span>, <span class="number">2049</span>, <span class="built_in">len</span>(labels)))  <span class="comment"># Magic number 2049 for labels</span></span><br><span class="line">        f.write(labels.tobytes())</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 加载训练好的模型</span></span><br><span class="line">    latent_dim = <span class="number">20</span></span><br><span class="line">    vae = VAE(latent_dim=latent_dim).to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line">    vae.load_state_dict(torch.load(<span class="string">&#x27;vae_gen_mnist.pth&#x27;</span>, weights_only=<span class="literal">True</span>))</span><br><span class="line">    vae.<span class="built_in">eval</span>()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 加载MNIST数据集</span></span><br><span class="line">    transform = transforms.ToTensor()</span><br><span class="line">    mnist_train = datasets.MNIST(root=<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">True</span>, transform=transform, download=<span class="literal">True</span>)</span><br><span class="line">    mnist_loader = DataLoader(mnist_train, batch_size=<span class="number">128</span>, shuffle=<span class="literal">True</span>, num_workers=<span class="number">4</span>, pin_memory=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 使用VAE生成样本 ========================</span></span><br><span class="line">    generated_samples = []</span><br><span class="line">    generated_labels = []</span><br><span class="line">    <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">        <span class="keyword">for</span> x, y <span class="keyword">in</span> mnist_loader:</span><br><span class="line">            x = x.to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line">            mu, log_var = vae.encode(x.view(-<span class="number">1</span>, <span class="number">784</span>))</span><br><span class="line">            z = vae.reparameterize(mu, log_var)</span><br><span class="line">            generated_images = vae.decode(z).cpu().view(-<span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>).numpy()  <span class="comment"># 转为 28x28 的 NumPy 数组</span></span><br><span class="line">            generated_samples.extend(generated_images)</span><br><span class="line">            generated_labels.extend(y.numpy())</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 将列表转换为单一 numpy 数组</span></span><br><span class="line">    generated_samples = np.array(generated_samples)  <span class="comment"># 转为 (N, 28, 28) 的 numpy 数组</span></span><br><span class="line">    generated_labels = np.array(generated_labels, dtype=np.uint8)  <span class="comment"># 转为 uint8 的标签数组</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 确保生成的样本数据在 [0, 255] 范围内</span></span><br><span class="line">    generated_samples = (generated_samples * <span class="number">255</span>).astype(np.uint8)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 保存生成的样本到 .ubyte 文件</span></span><br><span class="line">    generated_images_path = <span class="string">&#x27;./enhanced_mnist/VAE-Generated-images-idx3-ubyte&#x27;</span></span><br><span class="line">    generated_labels_path = <span class="string">&#x27;./enhanced_mnist/VAE-Generated-labels-idx1-ubyte&#x27;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 将生成的样本和标签打包成数据集</span></span><br><span class="line">    generated_dataset = [(torch.tensor(image, dtype=torch.uint8), label) <span class="keyword">for</span> image, label <span class="keyword">in</span> <span class="built_in">zip</span>(generated_samples, generated_labels)]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 使用 save_dataset 函数保存生成的数据集</span></span><br><span class="line">    save_dataset(generated_images_path, generated_labels_path, generated_dataset)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;生成的数据集已保存到文件：&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot; - 图像文件: <span class="subst">&#123;generated_images_path&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot; - 标签文件: <span class="subst">&#123;generated_labels_path&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="CGAN数据增强实现部分："><a href="#CGAN数据增强实现部分：" class="headerlink" title="CGAN数据增强实现部分："></a>CGAN数据增强实现部分：</h1><h2 id="CGAN训练代码train-gan-py"><a href="#CGAN训练代码train-gan-py" class="headerlink" title="CGAN训练代码train_gan.py:"></a>CGAN训练代码<code>train_gan.py</code>:</h2><h3 id="依赖项：-2"><a href="#依赖项：-2" class="headerlink" title="依赖项："></a>依赖项：</h3><p><code>torch</code><br><code>torchvision</code></p>
+<h3 id="CGAN模型："><a href="#CGAN模型：" class="headerlink" title="CGAN模型："></a>CGAN模型：</h3><h4 id="生成器设计（Generator）"><a href="#生成器设计（Generator）" class="headerlink" title="生成器设计（Generator）:"></a>生成器设计（Generator）:</h4><p>​	生成器模型用于生成与真实图像相似的图像。其结构如下：  </p>
+<h5 id="嵌入层："><a href="#嵌入层：" class="headerlink" title="嵌入层："></a>嵌入层：</h5><ul>
+<li>label_emb：将类别标签嵌入到与噪声向量相同的维度中。</li>
+<li>参数：num_classes（类别数），num_classes（嵌入向量维度）。</li>
+</ul>
+<h5 id="全连接层："><a href="#全连接层：" class="headerlink" title="全连接层："></a>全连接层：</h5><ul>
+<li>fc：将噪声向量和嵌入标签连接起来，并通过全连接层进行处理。</li>
+<li>全连接层参数：输入维度 input_size + num_classes，输出维度 num_feature。</li>
+</ul>
+<h5 id="卷积层："><a href="#卷积层：" class="headerlink" title="卷积层："></a>卷积层：</h5><ul>
+<li>conv1_g：包含卷积层、批归一化层和ReLU激活函数。</li>
+<li>卷积层参数：输入通道数 1，输出通道数 50，卷积核大小 3，填充 1。</li>
+<li>conv2_g：包含卷积层、批归一化层和ReLU激活函数。</li>
+<li>卷积层参数：输入通道数 50，输出通道数 25，卷积核大小 3，填充 1。</li>
+<li>conv3_g：包含卷积层和Tanh激活函数。</li>
+<li>卷积层参数：输入通道数 25，输出通道数 1，卷积核大小 2，步幅 2。</li>
+</ul>
+<h4 id="判别器设计（Discriminator）："><a href="#判别器设计（Discriminator）：" class="headerlink" title="判别器设计（Discriminator）："></a>判别器设计（Discriminator）：</h4><p>​	判别器模型用于区分真实图像和生成图像。其结构如下：  </p>
+<h5 id="嵌入层：-1"><a href="#嵌入层：-1" class="headerlink" title="嵌入层："></a>嵌入层：</h5><ul>
+<li>label_emb：将类别标签嵌入到与图像大小相同的向量中。</li>
+<li>参数：num_classes（类别数），28 * 28（嵌入向量维度）。</li>
+</ul>
+<h5 id="卷积层：-1"><a href="#卷积层：-1" class="headerlink" title="卷积层："></a>卷积层：</h5><ul>
+<li>conv1：包含卷积层、LeakyReLU激活函数和最大池化层。</li>
+<li>卷积层参数：输入通道数 2，输出通道数 32，卷积核大小 5，填充 2。</li>
+<li>conv2：包含卷积层、LeakyReLU激活函数和最大池化层。</li>
+<li>卷积层参数：输入通道数 32，输出通道数 64，卷积核大小 5，填充 2。</li>
+</ul>
+<h5 id="全连接层：-1"><a href="#全连接层：-1" class="headerlink" title="全连接层："></a>全连接层：</h5><ul>
+<li>fc：包含全连接层、LeakyReLU激活函数和Sigmoid激活函数。</li>
+<li>全连接层参数：输入维度 64 * 7 * 7，输出维度 1024 和 1。</li>
+</ul>
+<h3 id="损失函数：-1"><a href="#损失函数：-1" class="headerlink" title="损失函数："></a>损失函数：</h3><p>GAN模型的损失函数是二元交叉熵损失函数（Binary Cross-Entropy Loss），定义如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">criterion = nn.BCELoss()</span><br></pre></td></tr></table></figure>
+
+<p>在训练过程中，判别器和生成器的损失分别计算如下：</p>
+<ul>
+<li><p>判别器损失（<code>d_loss</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">d_loss_real = criterion(real_out, real_label)</span><br><span class="line">d_loss_fake = criterion(fake_out, fake_label)</span><br><span class="line">d_loss = d_loss_real + d_loss_fake</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>生成器损失（<code>g_loss</code>）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g_loss = criterion(output, real_label)</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="训练：-1"><a href="#训练：-1" class="headerlink" title="训练："></a>训练：</h3><ol>
+<li>加载MNIST数据集。</li>
+<li>初始化GAN模型和优化器。</li>
+<li>训练模型若干个epoch，更新模型参数以最小化损失函数。</li>
+<li>将训练好的模型保存到文件。</li>
+</ol>
+<h3 id="代码：-2"><a href="#代码：-2" class="headerlink" title="代码："></a>代码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets, transforms</span><br><span class="line"><span class="keyword">from</span> torch.autograd <span class="keyword">import</span> Variable</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line"><span class="comment"># # ======================== 创建保存图像的文件夹 ========================</span></span><br><span class="line"><span class="comment"># if not os.path.exists(&#x27;./GAN&#x27;):</span></span><br><span class="line"><span class="comment">#     os.mkdir(&#x27;./GAN&#x27;)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 定义图像转换函数 ========================</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">to_img</span>(<span class="params">x</span>):</span><br><span class="line">    out = <span class="number">0.5</span> * (x + <span class="number">1</span>)</span><br><span class="line">    out = out.clamp(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    out = out.view(-<span class="number">1</span>, <span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)</span><br><span class="line">    <span class="keyword">return</span> out</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 设置超参数 ========================</span></span><br><span class="line">batch_size = <span class="number">128</span> <span class="comment"># 批处理大小</span></span><br><span class="line">num_epoch = <span class="number">150</span>  <span class="comment"># 训练epoch</span></span><br><span class="line">z_dimension = <span class="number">100</span>  <span class="comment"># 噪声维度</span></span><br><span class="line">num_classes = <span class="number">10</span>  <span class="comment"># 类别数</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 图像处理 ========================</span></span><br><span class="line">transform = transforms.Compose([</span><br><span class="line">    transforms.ToTensor(),</span><br><span class="line">    transforms.Normalize(mean=[<span class="number">0.5</span>], std=[<span class="number">0.5</span>])</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 加载MNIST数据集 ========================</span></span><br><span class="line">mnist = datasets.MNIST(</span><br><span class="line">    root=<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">True</span>, transform=transform, download=<span class="literal">True</span>)</span><br><span class="line">dataloader = torch.utils.data.DataLoader(</span><br><span class="line">    dataset=mnist, batch_size=batch_size, shuffle=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 定义判别器模型 ========================</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Discriminator</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, num_classes</span>):</span><br><span class="line">        <span class="built_in">super</span>(Discriminator, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.label_emb = nn.Embedding(num_classes, <span class="number">28</span> * <span class="number">28</span>)</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">2</span>, <span class="number">32</span>, <span class="number">5</span>, padding=<span class="number">2</span>),  <span class="comment"># batch, 32, 28, 28</span></span><br><span class="line">            nn.LeakyReLU(<span class="number">0.2</span>),</span><br><span class="line">            nn.MaxPool2d(<span class="number">2</span>, stride=<span class="number">2</span>)  <span class="comment"># batch, 32, 14, 14</span></span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">32</span>, <span class="number">64</span>, <span class="number">5</span>, padding=<span class="number">2</span>),  <span class="comment"># batch, 64, 14, 14</span></span><br><span class="line">            nn.LeakyReLU(<span class="number">0.2</span>),</span><br><span class="line">            nn.MaxPool2d(<span class="number">2</span>, stride=<span class="number">2</span>)  <span class="comment"># batch, 64, 7, 7</span></span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="number">64</span> * <span class="number">7</span> * <span class="number">7</span>, <span class="number">1024</span>),</span><br><span class="line">            nn.LeakyReLU(<span class="number">0.2</span>),</span><br><span class="line">            nn.Linear(<span class="number">1024</span>, <span class="number">1</span>),</span><br><span class="line">            nn.Sigmoid()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, img, labels</span>):</span><br><span class="line">        label_embedding = <span class="variable language_">self</span>.label_emb(labels).view(labels.size(<span class="number">0</span>), <span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)</span><br><span class="line">        x = torch.cat((img, label_embedding), <span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv1(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv2(x)</span><br><span class="line">        x = x.view(x.size(<span class="number">0</span>), -<span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.fc(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 定义生成器模型 ========================</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Generator</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, input_size, num_feature, num_classes</span>):</span><br><span class="line">        <span class="built_in">super</span>(Generator, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.label_emb = nn.Embedding(num_classes, num_classes)</span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(input_size + num_classes, num_feature)  <span class="comment"># batch, 3136=1x56x56</span></span><br><span class="line">        <span class="variable language_">self</span>.br = nn.Sequential(</span><br><span class="line">            nn.BatchNorm2d(<span class="number">1</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv1_g = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">1</span>, <span class="number">50</span>, <span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>),  <span class="comment"># batch, 50, 56, 56</span></span><br><span class="line">            nn.BatchNorm2d(<span class="number">50</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv2_g = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">50</span>, <span class="number">25</span>, <span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>),  <span class="comment"># batch, 25, 56, 56</span></span><br><span class="line">            nn.BatchNorm2d(<span class="number">25</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv3_g = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">25</span>, <span class="number">1</span>, <span class="number">2</span>, stride=<span class="number">2</span>),  <span class="comment"># batch, 1, 28, 28</span></span><br><span class="line">            nn.Tanh()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, noise, labels</span>):</span><br><span class="line">        label_embedding = <span class="variable language_">self</span>.label_emb(labels)</span><br><span class="line">        x = torch.cat((noise, label_embedding), -<span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.fc(x)</span><br><span class="line">        x = x.view(x.size(<span class="number">0</span>), <span class="number">1</span>, <span class="number">56</span>, <span class="number">56</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.br(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv1_g(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv2_g(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv3_g(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># ======================== 初始化模型 ========================</span></span><br><span class="line">    discriminator = Discriminator(num_classes)</span><br><span class="line">    generator = Generator(z_dimension, <span class="number">3136</span>,num_classes)</span><br><span class="line">    <span class="keyword">if</span> torch.cuda.is_available():</span><br><span class="line">        discriminator = discriminator.cuda()</span><br><span class="line">        generator = generator.cuda()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 定义损失函数和优化器 ========================</span></span><br><span class="line">    <span class="comment"># 使用二元交叉熵损失函数</span></span><br><span class="line">    criterion = nn.BCELoss()</span><br><span class="line">    d_optimizer = torch.optim.Adam(discriminator.parameters(), lr=<span class="number">0.0001</span>)</span><br><span class="line">    g_optimizer = torch.optim.Adam(generator.parameters(), lr=<span class="number">0.0001</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        generator.load_state_dict(torch.load(<span class="string">&#x27;./GAN_generator.pth&#x27;</span>, weights_only=<span class="literal">True</span>))</span><br><span class="line">        discriminator.load_state_dict(torch.load(<span class="string">&#x27;./GAN_discriminator.pth&#x27;</span>, weights_only=<span class="literal">True</span>))</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\n--------Model restored--------\n&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\n--------Model not restored: File not found--------\n&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;\n--------Model not restored: <span class="subst">&#123;e&#125;</span>--------\n&quot;</span>)</span><br><span class="line">    <span class="comment"># ======================== 训练模型 ========================</span></span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(num_epoch):</span><br><span class="line">        <span class="keyword">for</span> i, (img, labels) <span class="keyword">in</span> <span class="built_in">enumerate</span>(dataloader):</span><br><span class="line">            num_img = img.size(<span class="number">0</span>)</span><br><span class="line">            real_img = Variable(img).cuda()</span><br><span class="line">            real_label = Variable(torch.ones(num_img)).cuda().unsqueeze(<span class="number">1</span>)</span><br><span class="line">            fake_label = Variable(torch.zeros(num_img)).cuda().unsqueeze(<span class="number">1</span>)</span><br><span class="line">            labels = Variable(labels).cuda()</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Train Discriminator</span></span><br><span class="line">            real_out = discriminator(real_img, labels)</span><br><span class="line">            d_loss_real = criterion(real_out, real_label)</span><br><span class="line">            real_scores = real_out  <span class="comment"># Closer to 1 means better</span></span><br><span class="line"></span><br><span class="line">            z = Variable(torch.randn(num_img, z_dimension)).cuda()</span><br><span class="line">            fake_img = generator(z, labels)</span><br><span class="line">            fake_out = discriminator(fake_img, labels)</span><br><span class="line">            d_loss_fake = criterion(fake_out, fake_label)</span><br><span class="line">            fake_scores = fake_out  <span class="comment"># Closer to 0 means better</span></span><br><span class="line"></span><br><span class="line">            d_loss = d_loss_real + d_loss_fake</span><br><span class="line">            d_optimizer.zero_grad()</span><br><span class="line">            d_loss.backward()</span><br><span class="line">            d_optimizer.step()</span><br><span class="line"></span><br><span class="line">            <span class="comment"># Train Generator</span></span><br><span class="line">            z = Variable(torch.randn(num_img, z_dimension)).cuda()</span><br><span class="line">            fake_img = generator(z, labels)</span><br><span class="line">            output = discriminator(fake_img, labels)</span><br><span class="line">            g_loss = criterion(output, real_label)</span><br><span class="line"></span><br><span class="line">            g_optimizer.zero_grad()</span><br><span class="line">            g_loss.backward()</span><br><span class="line">            g_optimizer.step()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (i + <span class="number">1</span>) % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">&#x27;Epoch [&#123;&#125;/&#123;&#125;], d_loss: &#123;:.6f&#125;, g_loss: &#123;:.6f&#125; &#x27;</span></span><br><span class="line">                      <span class="string">&#x27;D real: &#123;:.6f&#125;, D fake: &#123;:.6f&#125;&#x27;</span>.<span class="built_in">format</span>(</span><br><span class="line">                    epoch, num_epoch, d_loss.item(), g_loss.item(),</span><br><span class="line">                    real_scores.data.mean(), fake_scores.data.mean()))</span><br><span class="line">    <span class="comment"># ======================== 保存模型 ========================</span></span><br><span class="line">    torch.save(generator.state_dict(), <span class="string">&#x27;./GAN_generator.pth&#x27;</span>)</span><br><span class="line">    torch.save(discriminator.state_dict(), <span class="string">&#x27;./GAN_discriminator.pth&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="CGAN生成代码generator-GAN-py："><a href="#CGAN生成代码generator-GAN-py：" class="headerlink" title="CGAN生成代码generator_GAN.py："></a>CGAN生成代码generator_GAN.py：</h2><h3 id="依赖项"><a href="#依赖项" class="headerlink" title="依赖项"></a>依赖项</h3><p>该项目需要以下依赖项：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">torch</span><br><span class="line">torchvision</span><br><span class="line">numpy</span><br></pre></td></tr></table></figure>
+
+<h3 id="CGAN模型"><a href="#CGAN模型" class="headerlink" title="CGAN模型"></a>CGAN模型</h3><p>​	条件生成对抗网络 (CGAN) 是一种在训练过程中也利用标签的 GAN。生成器 - 给定标签和随机数组作为输入，该网络生成与对应相同标签的训练数据观察具有相同结构的数据。生成器用于生成与真实图像相似的图像，判别器用于区分真实图像和生成图像。在本文件中因为已经默认使用了MNIST数据集对模型进行过了训练，所以本文件中就没有用到辨别器（Discriminator），只用到了生成器。</p>
+<p>生成器模型的结构如下：</p>
+<ol>
+<li><p><strong>嵌入层</strong>：</p>
+<ul>
+<li><code>label_emb</code>：将类别标签嵌入到与噪声向量相同的维度中。</li>
+<li>参数：<code>num_classes</code>（类别数），<code>num_classes</code>（嵌入向量维度）。</li>
+</ul>
+</li>
+<li><p><strong>全连接层</strong>：</p>
+<ul>
+<li><code>fc</code>：将噪声向量和嵌入标签连接起来，并通过全连接层进行处理。</li>
+<li>参数：输入维度 <code>input_size + num_classes</code>，输出维度 <code>num_feature</code>。</li>
+</ul>
+</li>
+<li><p><strong>卷积层</strong>：</p>
+<ul>
+<li><code>conv1_g</code>：包含卷积层、批归一化层和ReLU激活函数。<ul>
+<li>参数：输入通道数 <code>1</code>，输出通道数 <code>50</code>，卷积核大小 <code>3</code>，填充 <code>1</code>。</li>
+</ul>
+</li>
+<li><code>conv2_g</code>：包含卷积层、批归一化层和ReLU激活函数。<ul>
+<li>参数：输入通道数 <code>50</code>，输出通道数 <code>25</code>，卷积核大小 <code>3</code>，填充 <code>1</code>。</li>
+</ul>
+</li>
+<li><code>conv3_g</code>：包含卷积层和Tanh激活函数。<ul>
+<li>参数：输入通道数 <code>25</code>，输出通道数 <code>1</code>，卷积核大小 <code>2</code>，步幅 <code>2</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="保存数据集的方法"><a href="#保存数据集的方法" class="headerlink" title="保存数据集的方法"></a>保存数据集的方法</h3><p>该项目提供了一个方法来保存生成的数据集到 <code>.ubyte</code> 文件中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">save_dataset</span>(<span class="params">images_filepath, labels_filepath, images, labels</span>):</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(images_filepath, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(struct.pack(<span class="string">&#x27;&gt;IIII&#x27;</span>, <span class="number">2051</span>, <span class="built_in">len</span>(images), <span class="number">28</span>, <span class="number">28</span>))  <span class="comment"># Magic number 2051 for images</span></span><br><span class="line">        f.write(images.tobytes())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(labels_filepath, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(struct.pack(<span class="string">&#x27;&gt;II&#x27;</span>, <span class="number">2049</span>, <span class="built_in">len</span>(labels)))  <span class="comment"># Magic number 2049 for labels</span></span><br><span class="line">        f.write(labels.tobytes())</span><br></pre></td></tr></table></figure>
+
+<h3 id="主要步骤"><a href="#主要步骤" class="headerlink" title="主要步骤"></a>主要步骤</h3><ol>
+<li><p><strong>导入必要的库</strong>：</p>
+<ul>
+<li>导入 <code>torch</code>、<code>torch.nn</code>、<code>numpy</code> 等库。</li>
+</ul>
+</li>
+<li><p><strong>定义生成器模型</strong>：</p>
+<ul>
+<li><code>Generator</code> 类包含嵌入层、全连接层和卷积层，用于生成图像。</li>
+</ul>
+</li>
+<li><p><strong>设置超参数</strong>：</p>
+<ul>
+<li>定义噪声维度、类别数、生成样本数量和输出目录。</li>
+</ul>
+</li>
+<li><p><strong>加载生成器模型</strong>：</p>
+<ul>
+<li>初始化生成器模型，并加载预训练的模型权重。</li>
+</ul>
+</li>
+<li><p><strong>生成数据集</strong>：</p>
+<ul>
+<li>使用生成器模型生成指定数量的样本和标签。</li>
+</ul>
+</li>
+<li><p><strong>保存生成的样本到 <code>.ubyte</code> 文件</strong>：</p>
+<ul>
+<li>使用 <code>save_dataset</code> 方法将生成的样本和标签保存到文件<code>GAN-Generated-images-idx3-ubyte</code>和<code>GAN-Generated-labels-idx1-ubyte</code>中。</li>
+</ul>
+</li>
+</ol>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch.autograd <span class="keyword">import</span> Variable</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Generator</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, input_size, num_feature, num_classes</span>):</span><br><span class="line">        <span class="built_in">super</span>(Generator, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.label_emb = nn.Embedding(num_classes, num_classes)</span><br><span class="line">        <span class="variable language_">self</span>.fc = nn.Linear(input_size + num_classes, num_feature)  <span class="comment"># batch, 3136=1x56x56</span></span><br><span class="line">        <span class="variable language_">self</span>.br = nn.Sequential(</span><br><span class="line">            nn.BatchNorm2d(<span class="number">1</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv1_g = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">1</span>, <span class="number">50</span>, <span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>),  <span class="comment"># batch, 50, 56, 56</span></span><br><span class="line">            nn.BatchNorm2d(<span class="number">50</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv2_g = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">50</span>, <span class="number">25</span>, <span class="number">3</span>, stride=<span class="number">1</span>, padding=<span class="number">1</span>),  <span class="comment"># batch, 25, 56, 56</span></span><br><span class="line">            nn.BatchNorm2d(<span class="number">25</span>),</span><br><span class="line">            nn.ReLU(<span class="literal">True</span>)</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.conv3_g = nn.Sequential(</span><br><span class="line">            nn.Conv2d(<span class="number">25</span>, <span class="number">1</span>, <span class="number">2</span>, stride=<span class="number">2</span>),  <span class="comment"># batch, 1, 28, 28</span></span><br><span class="line">            nn.Tanh()</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, noise, labels</span>):</span><br><span class="line">        label_embedding = <span class="variable language_">self</span>.label_emb(labels)</span><br><span class="line">        x = torch.cat((noise, label_embedding), -<span class="number">1</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.fc(x)</span><br><span class="line">        x = x.view(x.size(<span class="number">0</span>), <span class="number">1</span>, <span class="number">56</span>, <span class="number">56</span>)</span><br><span class="line">        x = <span class="variable language_">self</span>.br(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv1_g(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv2_g(x)</span><br><span class="line">        x = <span class="variable language_">self</span>.conv3_g(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置超参数</span></span><br><span class="line">z_dimension = <span class="number">100</span>  <span class="comment"># 噪声维度</span></span><br><span class="line">num_classes = <span class="number">10</span>  <span class="comment"># 类别数</span></span><br><span class="line">num_samples = <span class="number">60000</span>  <span class="comment"># 生成样本数量</span></span><br><span class="line">output_dir = <span class="string">&#x27;./enhanced_mnist&#x27;</span>  <span class="comment"># 输出目录</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建输出目录</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(output_dir):</span><br><span class="line">    os.makedirs(output_dir)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载生成器模型</span></span><br><span class="line">generator = Generator(z_dimension, <span class="number">3136</span>, num_classes)</span><br><span class="line">generator.load_state_dict(torch.load(<span class="string">&#x27;./GAN_generator.pth&#x27;</span>, weights_only=<span class="literal">True</span>))</span><br><span class="line">generator.<span class="built_in">eval</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> torch.cuda.is_available():</span><br><span class="line">    generator = generator.cuda()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成数据集</span></span><br><span class="line">generated_samples = []</span><br><span class="line">generated_labels = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(num_samples):</span><br><span class="line">    z = Variable(torch.randn(<span class="number">1</span>, z_dimension)).cuda()</span><br><span class="line">    labels = Variable(torch.randint(<span class="number">0</span>, num_classes, (<span class="number">1</span>,))).cuda()</span><br><span class="line">    fake_img = generator(z, labels)</span><br><span class="line">    fake_img = fake_img.cpu().data.numpy().squeeze() * <span class="number">255</span>  <span class="comment"># 转为 numpy 数组并缩放到 [0, 255]</span></span><br><span class="line">    generated_samples.append(fake_img.astype(np.uint8))</span><br><span class="line">    generated_labels.append(labels.cpu().item())</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将生成的样本和标签打包成数据集</span></span><br><span class="line">generated_samples = np.stack(generated_samples)</span><br><span class="line">generated_labels = np.array(generated_labels, dtype=np.uint8)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 保存生成的样本到 .ubyte 文件</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">save_dataset</span>(<span class="params">images_filepath, labels_filepath, images, labels</span>):</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(images_filepath, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(struct.pack(<span class="string">&#x27;&gt;IIII&#x27;</span>, <span class="number">2051</span>, <span class="built_in">len</span>(images), <span class="number">28</span>, <span class="number">28</span>))  <span class="comment"># Magic number 2051 for images</span></span><br><span class="line">        f.write(images.tobytes())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(labels_filepath, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        f.write(struct.pack(<span class="string">&#x27;&gt;II&#x27;</span>, <span class="number">2049</span>, <span class="built_in">len</span>(labels)))  <span class="comment"># Magic number 2049 for labels</span></span><br><span class="line">        f.write(labels.tobytes())</span><br><span class="line"></span><br><span class="line">generated_images_path = os.path.join(output_dir, <span class="string">&#x27;GAN-Generated-images-idx3-ubyte&#x27;</span>)</span><br><span class="line">generated_labels_path = os.path.join(output_dir, <span class="string">&#x27;GAN-Generated-labels-idx1-ubyte&#x27;</span>)</span><br><span class="line"></span><br><span class="line">save_dataset(generated_images_path, generated_labels_path, generated_samples, generated_labels)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;生成的数据集已保存到文件：&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot; - 图像文件: <span class="subst">&#123;generated_images_path&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot; - 标签文件: <span class="subst">&#123;generated_labels_path&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="三种数据集可视化对比展示："><a href="#三种数据集可视化对比展示：" class="headerlink" title="三种数据集可视化对比展示："></a>三种数据集可视化对比展示：</h1><h2 id="原始MNIST数据集展示图："><a href="#原始MNIST数据集展示图：" class="headerlink" title="原始MNIST数据集展示图："></a>原始MNIST数据集展示图：</h2><p>​	<img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412121937255.png" alt="plot_2024-12-12 00-02-25_0"></p>
+<h2 id="VAE增强数据集展示图："><a href="#VAE增强数据集展示图：" class="headerlink" title="VAE增强数据集展示图："></a>VAE增强数据集展示图：</h2><p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412122335686.png" alt="plot_2024-12-12 23-34-41_2"></p>
+<h2 id="CGAN增强数据集展示图："><a href="#CGAN增强数据集展示图：" class="headerlink" title="CGAN增强数据集展示图："></a>CGAN增强数据集展示图：</h2><p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412122336984.png" alt="plot_2024-12-12 23-34-41_1"></p>
+<h1 id="分别用三种数据集训练分类模型："><a href="#分别用三种数据集训练分类模型：" class="headerlink" title="分别用三种数据集训练分类模型："></a>分别用三种数据集训练分类模型：</h1><h2 id="分类模型选择：LeNet5"><a href="#分类模型选择：LeNet5" class="headerlink" title="分类模型选择：LeNet5"></a>分类模型选择：LeNet5</h2><p>我的这里的深度学习的分类模型选择的是LeNet5模型，当然LeNet5模型本身可以对图像的横向纵向进行特征提取就可以达到99%的正确识别率具体为：</p>
+<h3 id="LeNet5-模型"><a href="#LeNet5-模型" class="headerlink" title="LeNet5 模型"></a>LeNet5 模型</h3><p>LeNet5 是一个经典的卷积神经网络（CNN）模型，主要用于图像分类任务。其结构如下：</p>
+<ol>
+<li><p><strong>卷积层 1</strong> (<code>conv1</code>)：</p>
+<ul>
+<li>输入通道数：1</li>
+<li>输出通道数：6</li>
+<li>卷积核大小：5</li>
+</ul>
+</li>
+<li><p><strong>卷积层 2</strong> (<code>conv2</code>)：</p>
+<ul>
+<li>输入通道数：6</li>
+<li>输出通道数：16</li>
+<li>卷积核大小：5</li>
+</ul>
+</li>
+<li><p><strong>全连接层 1</strong> (<code>fc1</code>)：</p>
+<ul>
+<li>输入维度：16 * 4 * 4</li>
+<li>输出维度：120</li>
+</ul>
+</li>
+<li><p><strong>全连接层 2</strong> (<code>fc2</code>)：</p>
+<ul>
+<li>输入维度：120</li>
+<li>输出维度：84</li>
+</ul>
+</li>
+<li><p><strong>全连接层 3</strong> (<code>fc3</code>)：</p>
+<ul>
+<li>输入维度：84</li>
+<li>输出维度：10</li>
+</ul>
+</li>
+</ol>
+<h3 id="前向传播过程"><a href="#前向传播过程" class="headerlink" title="前向传播过程"></a>前向传播过程</h3><ol>
+<li>输入图像通过第一个卷积层 (<code>conv1</code>)，然后经过 ReLU 激活函数。</li>
+<li>经过最大池化层 (<code>max_pool2d</code>)。</li>
+<li>通过第二个卷积层 (<code>conv2</code>)，然后经过 ReLU 激活函数。</li>
+<li>再次经过最大池化层 (<code>max_pool2d</code>)。</li>
+<li>将特征图展平为一维向量。</li>
+<li>通过第一个全连接层 (<code>fc1</code>)，然后经过 ReLU 激活函数。</li>
+<li>通过第二个全连接层 (<code>fc2</code>)，然后经过 ReLU 激活函数。</li>
+<li>通过第三个全连接层 (<code>fc3</code>)，输出分类结果。</li>
+</ol>
+<h3 id="类代码如下："><a href="#类代码如下：" class="headerlink" title="类代码如下："></a>类代码如下：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LeNet5</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(LeNet5, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">1</span>, <span class="number">6</span>, kernel_size=<span class="number">5</span>)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(<span class="number">6</span>, <span class="number">16</span>, kernel_size=<span class="number">5</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc1 = nn.Linear(<span class="number">16</span> * <span class="number">4</span> * <span class="number">4</span>, <span class="number">120</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc2 = nn.Linear(<span class="number">120</span>, <span class="number">84</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc3 = nn.Linear(<span class="number">84</span>, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.conv1(x))</span><br><span class="line">        x = torch.max_pool2d(x, <span class="number">2</span>)</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.conv2(x))</span><br><span class="line">        x = torch.max_pool2d(x, <span class="number">2</span>)</span><br><span class="line">        x = x.view(-<span class="number">1</span>, <span class="number">16</span> * <span class="number">4</span> * <span class="number">4</span>)</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.fc1(x))</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.fc2(x))</span><br><span class="line">        x = <span class="variable language_">self</span>.fc3(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+
+<h2 id="损失函数和优化器："><a href="#损失函数和优化器：" class="headerlink" title="损失函数和优化器："></a>损失函数和优化器：</h2><ol>
+<li><p><strong>设置损失函数</strong>：</p>
+<ul>
+<li><code>criterion = nn.CrossEntropyLoss()</code>：使用交叉熵损失函数（Cross-Entropy Loss），这是一个常用的分类任务损失函数。</li>
+</ul>
+</li>
+<li><p><strong>设置优化器</strong>：</p>
+<ul>
+<li><code>optimizer = optim.Adam(leNet.parameters(), lr=learning_rate)</code>：使用Adam优化器，并设置学习率。Adam优化器是一种自适应学习率优化算法，适用于大多数深度学习模型。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">criterion = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = optim.Adam(leNet.parameters(), lr=learning_rate)</span><br></pre></td></tr></table></figure>
+
+<h2 id="代码：-3"><a href="#代码：-3" class="headerlink" title="代码："></a>代码：</h2><p>三种训练LeNet5的代码都一样只有数据集加载处有些改动，写的时候为了方便调试拆成了3个单独的文件，其中一个利用GAN训练增强数据集<code>GAN_Train_LeNet_Combined.py</code>的代码如下，（另外两个VAE和Original都类似，仅仅只有加载数据集过程中有些小区别）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets, transforms</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader, ConcatDataset</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 定义LeNet模型 ========================</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LeNet5</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>(LeNet5, <span class="variable language_">self</span>).__init__()</span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(<span class="number">1</span>, <span class="number">6</span>, kernel_size=<span class="number">5</span>)</span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(<span class="number">6</span>, <span class="number">16</span>, kernel_size=<span class="number">5</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc1 = nn.Linear(<span class="number">16</span> * <span class="number">4</span> * <span class="number">4</span>, <span class="number">120</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc2 = nn.Linear(<span class="number">120</span>, <span class="number">84</span>)</span><br><span class="line">        <span class="variable language_">self</span>.fc3 = nn.Linear(<span class="number">84</span>, <span class="number">10</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.conv1(x))</span><br><span class="line">        x = torch.max_pool2d(x, <span class="number">2</span>)</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.conv2(x))</span><br><span class="line">        x = torch.max_pool2d(x, <span class="number">2</span>)</span><br><span class="line">        x = x.view(-<span class="number">1</span>, <span class="number">16</span> * <span class="number">4</span> * <span class="number">4</span>)</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.fc1(x))</span><br><span class="line">        x = torch.relu(<span class="variable language_">self</span>.fc2(x))</span><br><span class="line">        x = <span class="variable language_">self</span>.fc3(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line"><span class="comment"># ======================== 加载增强的数据集 ========================</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">load_enhanced_dataset</span>(<span class="params">images_path, labels_path</span>):</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(images_path, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        images = np.frombuffer(f.read(), dtype=np.uint8, offset=<span class="number">16</span>).reshape(-<span class="number">1</span>, <span class="number">28</span>, <span class="number">28</span>)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(labels_path, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        labels = np.frombuffer(f.read(), dtype=np.uint8, offset=<span class="number">8</span>)</span><br><span class="line">    <span class="keyword">return</span> [(torch.tensor(image, dtype=torch.float32).unsqueeze(<span class="number">0</span>), label) <span class="keyword">for</span> image, label <span class="keyword">in</span> <span class="built_in">zip</span>(images, labels)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># ======================== 设置超参数 ========================</span></span><br><span class="line">    batch_size = <span class="number">64</span></span><br><span class="line">    learning_rate = <span class="number">0.001</span></span><br><span class="line">    num_epochs = <span class="number">50</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 数据预处理 ========================</span></span><br><span class="line">    transform = transforms.Compose([</span><br><span class="line">        transforms.ToTensor(),</span><br><span class="line">        transforms.Normalize((<span class="number">0.1307</span>,), (<span class="number">0.3081</span>,))</span><br><span class="line">    ])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 加载MNIST数据集 ========================</span></span><br><span class="line">    train_dataset = datasets.MNIST(root=<span class="string">&#x27;./data&#x27;</span>, train=<span class="literal">True</span>, transform=transform, download=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># test_dataset = datasets.MNIST(root=&#x27;./data&#x27;, train=False, transform=transform, download=True)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 加载增强的数据集 ========================</span></span><br><span class="line">    enhanced_images_path = <span class="string">&#x27;./enhanced_mnist/GAN-Generated-images-idx3-ubyte&#x27;</span></span><br><span class="line">    enhanced_labels_path = <span class="string">&#x27;./enhanced_mnist/GAN-Generated-labels-idx1-ubyte&#x27;</span></span><br><span class="line">    enhanced_dataset = load_enhanced_dataset(enhanced_images_path, enhanced_labels_path)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 合并数据集 ========================</span></span><br><span class="line">    combined_train_dataset = ConcatDataset([train_dataset, enhanced_dataset])</span><br><span class="line">    train_loader = DataLoader(combined_train_dataset, batch_size=batch_size, shuffle=<span class="literal">True</span>)</span><br><span class="line">    <span class="comment"># test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 初始化模型、损失函数和优化器 ========================</span></span><br><span class="line">    leNet = LeNet5().to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line">    criterion = nn.CrossEntropyLoss()</span><br><span class="line">    optimizer = optim.Adam(leNet.parameters(), lr=learning_rate)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        leNet.load_state_dict(torch.load(<span class="string">&#x27;GAN_leNet_mnist.pth&#x27;</span>, weights_only=<span class="literal">True</span>))</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Model loaded successfully.&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;Model file not found. Initializing model with random weights.&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 训练模型 ========================</span></span><br><span class="line">    <span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(num_epochs):</span><br><span class="line">        leNet.train()</span><br><span class="line">        running_loss = <span class="number">0.0</span></span><br><span class="line">        <span class="keyword">for</span> images, labels <span class="keyword">in</span> train_loader:</span><br><span class="line">            images, labels = images.to(<span class="string">&#x27;cuda&#x27;</span>), labels.to(<span class="string">&#x27;cuda&#x27;</span>)</span><br><span class="line"></span><br><span class="line">            optimizer.zero_grad()</span><br><span class="line">            outputs = leNet(images)</span><br><span class="line">            loss = criterion(outputs, labels)</span><br><span class="line">            loss.backward()</span><br><span class="line">            optimizer.step()</span><br><span class="line"></span><br><span class="line">            running_loss += loss.item()</span><br><span class="line"></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Epoch [<span class="subst">&#123;epoch+<span class="number">1</span>&#125;</span>/<span class="subst">&#123;num_epochs&#125;</span>], Loss: <span class="subst">&#123;running_loss/<span class="built_in">len</span>(train_loader):<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># ======================== 保存模型 ========================</span></span><br><span class="line">    torch.save(leNet.state_dict(), <span class="string">&#x27;GAN_leNet_mnist.pth&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="效果对比"><a href="#效果对比" class="headerlink" title="效果对比"></a>效果对比</h1><p>这里基于MNIST测试集对比三种训练集得到的模型做分类准确率评估评估效果如下：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412122341083.png" alt="plot_2024-12-12 23-34-41_3"></p>
+<p>三种数据集分别训练LeNet5模型进行分类的成功率如下：</p>
+<p>原始数据集：98.98%</p>
+<p>利用VAE增强的数据集：98.80%</p>
+<p>利用GAN增强的数据集：98.37%</p>
+<h1 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h1><p>​	利用增强数据集训练的 LeNet 模型，分类效果略微下降了一些，但整体分类成功率仍能保持在 <strong>98%</strong> 以上。这可能是因为：</p>
+<ol>
+<li>VAE 和 CGAN 是基于训练集中的数据进行样本生成的，其生成的样本往往会使整个样本集的数据特征更加集中于某些特定方面。当生成的数据过于充分时，这种特性在训练 LeNet-5 时可能进一步削弱其泛化能力，从而导致<strong>过拟合</strong>，在测试集上表现为分类能力下降和性能减退。这一问题在 LeNet-5 这样的复杂多层卷积网络中尤为显著。</li>
+<li>我认为，部分过拟合现象可能也与数据集本身过于简单有关。以 MNIST 数据集为例，其本身较为简单，而且训练集已经包含了 60,000 条数据，数量相当充足。在数据增强后，训练集的样本数量更是达到了 120,000 条。假设这些增强数据均为有效样本，那么对于像 LeNet-5 这样专注于分类任务的卷积神经网络来说，更容易出现<strong>过拟合</strong>现象。</li>
+<li>CGAN 的工作模式可能会加重<strong>过拟合</strong>现象。这是因为 GAN 模式中的 Discriminator 是基于训练集对 Generator 生成的数据进行辨别的，而这种<strong>对抗性</strong>机制会导致 Discriminator 和 Generator 在训练集上表现得过于“精准”，从而更容易出现过拟合问题。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    打赏一下
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="jianing dai 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="jianing dai 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/AI/" rel="tag"># AI</a>
+              <a href="/tags/VAE/" rel="tag"># VAE</a>
+              <a href="/tags/LeNet/" rel="tag"># LeNet</a>
+              <a href="/tags/GenAI/" rel="tag"># GenAI</a>
+              <a href="/tags/CGAN/" rel="tag"># CGAN</a>
+              <a href="/tags/GAN/" rel="tag"># GAN</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/11/25/GNN-Learing/" rel="prev" title="GNN_Learing">
+                  <i class="fa fa-angle-left"></i> GNN_Learing
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  <div class="comments" id="disqus_thread">
+    <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+  </div>
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">jianing dai</span>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jianingdai" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/sidebar.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script class="next-config" data-name="disqus" type="application/json">{"enable":true,"shortname":"jianingdai-github-io","count":true,"i18n":{"disqus":"disqus"}}</script>
+<script src="/js/third-party/comments/disqus.js"></script>
+
+</body>
+</html>

@@ -19,20 +19,23 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"jianingdai.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Hello World! :)">
+    <meta name="description" content="本推文为我本身学习GNN（图神经网络）的一种记录。包含一些基础知识点和图神经网络的一些相关的简单实验">
 <meta property="og:type" content="article">
 <meta property="og:title" content="GNN_Learing">
 <meta property="og:url" content="http://jianingdai.github.io/2024/11/25/GNN-Learing/index.html">
 <meta property="og:site_name" content="小代爱学习">
-<meta property="og:description" content="Hello World! :)">
+<meta property="og:description" content="本推文为我本身学习GNN（图神经网络）的一种记录。包含一些基础知识点和图神经网络的一些相关的简单实验">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412151605608.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412151708305.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412161345113.png">
 <meta property="article:published_time" content="2024-11-25T07:47:53.000Z">
-<meta property="article:modified_time" content="2024-11-25T10:51:41.643Z">
+<meta property="article:modified_time" content="2024-12-16T05:48:43.787Z">
 <meta property="article:author" content="jianing dai">
-<meta property="article:tag" content="GNN_Learning">
+<meta property="article:tag" content="GNN">
 <meta property="article:tag" content="AI">
-<meta property="article:tag" content="图神经网络">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412151605608.png">
 
 
 <link rel="canonical" href="http://jianingdai.github.io/2024/11/25/GNN-Learing/">
@@ -129,7 +132,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -142,6 +145,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E6%A1%A3%E8%AF%B4%E6%98%8E%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">文档说明：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C"><span class="nav-number">2.</span> <span class="nav-text">图神经网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">2.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.</span> <span class="nav-text">典型问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%9B%BE%E9%9D%A2%E4%B8%B4%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">2.3.</span> <span class="nav-text">机器学习中使用图面临的挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%9A"><span class="nav-number">2.4.</span> <span class="nav-text">最简单的图神经网络：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GNN%E5%9C%A8%E4%BE%9B%E5%BA%94%E9%93%BE%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">GNN在供应链中的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%9B%E5%BA%94%E9%93%BE%E4%B8%8EGNN"><span class="nav-number">3.1.</span> <span class="nav-text">供应链与GNN</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -156,18 +160,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">文章</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -216,7 +220,7 @@
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
       <meta itemprop="name" content="GNN_Learing | 小代爱学习">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content="本推文为我本身学习GNN（图神经网络）的一种记录。包含一些基础知识点和图神经网络的一些相关的简单实验">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -230,9 +234,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">提交于</span>
-      
 
-      <time title="创建时间：2024-11-25 15:47:53 / 修改时间：18:51:41" itemprop="dateCreated datePublished" datetime="2024-11-25T15:47:53+08:00">2024-11-25</time>
+      <time title="创建时间：2024-11-25 15:47:53" itemprop="dateCreated datePublished" datetime="2024-11-25T15:47:53+08:00">2024-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-12-16 13:48:43" itemprop="dateModified" datetime="2024-12-16T13:48:43+08:00">2024-12-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -240,7 +250,11 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/GNN/" itemprop="url" rel="index"><span itemprop="name">GNN</span></a>
+          <a href="/categories/AI/" itemprop="url" rel="index"><span itemprop="name">AI</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/AI/GNN/" itemprop="url" rel="index"><span itemprop="name">GNN</span></a>
         </span>
     </span>
 
@@ -261,13 +275,45 @@
   
 </div>
 
+            <div class="post-description">本推文为我本身学习GNN（图神经网络）的一种记录。包含一些基础知识点和图神经网络的一些相关的简单实验</div>
         </div>
       </header>
 
     
     
     
-    <div class="post-body" itemprop="articleBody">
+    <div class="post-body" itemprop="articleBody"><h1 id="文档说明："><a href="#文档说明：" class="headerlink" title="文档说明："></a>文档说明：</h1><p>​	我本身的研究方向就是利用<strong>GNN（图神经网络 Graph neural network）</strong>解决<code>软件运维问题/产业链风险问题</code>的，这篇文章就主要是偏向于技术报告似的学习文章，同时也包含一些相关的实验作为支撑。本文章主要以供应链来为例进行说明GNN在供应链等现实实例上面的具体应用方法。</p>
+<h1 id="图神经网络"><a href="#图神经网络" class="headerlink" title="图神经网络"></a>图神经网络</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>​	首先就是图无处不在；现实世界中的物体通常用它们与其他事物的联系来定义。一组物体以及它们之间的联系自然地表示为图。我们在这里先明确一下，本文章所提到所有的图（Graph）不是指的 “图像（image）” 中的图，图表示一组实体（节点）之间的关系（边）。【A graph represents the relations (<em>edges</em>) between a collection of entities (<em>nodes</em>).】一个标准的图包括（V,E,U），其中V代表Vertex（节点），E代表Edge（边），U代表Global attributes（全局属性）。如下图（image）中显示的就是一个典型的图：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412151605608.png" alt="image-20241215160506512"></p>
+<p>​	图中的信息可以通过顶点（Vertex）嵌入或者边（Edge）嵌入等方式来利用图存储信息。全局（或主节点）嵌入。图分为有向图和无向图。</p>
+<p>​	目前的研究方向中除了经典的图数据对象，还有例如图像可以化为图【Images as graphs】、文本作为图【Text as graphs】 等等一些意想不到的更为广泛的应用。</p>
+<h2 id="典型问题"><a href="#典型问题" class="headerlink" title="典型问题"></a>典型问题</h2><p>​	我们已经描述了一些图的简单介绍，但我们在这些数据上想执行哪些任务呢？在图上，有三种一般的预测任务类型：图级别、节点级别和边级别。</p>
+<ol>
+<li>在图级任务中，我们预测整个图的一个属性。</li>
+<li>对于节点级任务，我们预测图中每个节点的某些属性。</li>
+<li>对于边级任务，我们想要预测图中边的属性或存在性。</li>
+</ol>
+<p>​	对于上述描述的三个预测级别问题（图级别、节点级别和边级别），我们将展示所有这些问题都可以使用单个模型类别，即 GNN 来解决。但首先，让我们在下一章节【<a href="#GNNInSupplyChain">GNN在供应链中的应用</a>】为每个问题提供具体的例子。</p>
+<h2 id="机器学习中使用图面临的挑战"><a href="#机器学习中使用图面临的挑战" class="headerlink" title="机器学习中使用图面临的挑战"></a>机器学习中使用图面临的挑战</h2><p>​	那么，我们如何使用神经网络来解决这些不同的图任务呢？第一步是考虑我们如何表示图以与神经网络兼容。</p>
+<p>​	机器学习模型通常以矩形或网格状数组作为输入。因此，如何将它们表示为与深度学习兼容的格式并不直观。图有四种类型的信息，我们可能会想要使用它们来进行预测：节点、边、全局上下文和连通性。前三种相对简单：例如，使用节点，我们可以形成一个节点特征矩阵 $N$ ，通过为每个节点分配一个索引 $i$ 并将特征 $node_i$存储在 $N$ 中。虽然这些矩阵具有可变数量的示例，但它们可以无需任何特殊技术进行处理。</p>
+<p>​	然而，表示图的连接性更为复杂。最明显的选择可能是使用邻接矩阵，因为这种表示很容易张量化。然而，这种表示有几个缺点。从示例数据集表中，我们看到图中节点的数量可以达到数百万，每个节点的边数可能高度可变。通常，这会导致非常稀疏的邻接矩阵，这会导致空间效率低下。</p>
+<p>​	另一个问题是，存在许多可以编码相同连接的邻接矩阵，并且无法保证这些不同的矩阵在深度神经网络中会产生相同的结果（也就是说，它们不是排列不变的）。</p>
+<p>​	一种优雅且内存高效的稀疏矩阵表示方法是作为邻接表。这些描述了节点之间的边连接性，例如在邻接表的第 k 个条目中，边 $e_k$ 之间的连接性用元组（i,j）表示。由于我们预计边的数量远低于邻接矩阵的条目数量 $\left( n_{\text{nodes}}^2 \right)$，我们避免了在图的不连通部分进行计算和存储。</p>
+<p>应注意，该图使用每个节点&#x2F;边&#x2F;全局的标量值，但大多数实际张量表示具有每个图属性的向量。我们将处理的节点张量大小为 $\left[ n_{\text{n}odes} \right]$ ，而不是 $[n_{\text{nodes}}, node_{\text{dim}}]$ 大小的节点张量。其他图属性也是如此。</p>
+<h2 id="最简单的图神经网络："><a href="#最简单的图神经网络：" class="headerlink" title="最简单的图神经网络："></a>最简单的图神经网络：</h2><p>​	使用向量代替标量，我们现在可以构建一个 GNN 了。我们将从最简单的 GNN 架构开始，其中一个我们为所有图属性（节点、边、全局）学习新的嵌入，但我们还没有使用图的连接性。</p>
+<p>​	该 GNN 在每个图的组件上使用一个单独的多层感知器（MLP）；我们称这为 GNN 层。对于每个节点向量，我们应用 MLP 并得到一个学习的节点向量。对于每个边，我们学习一个边的嵌入，并且对于全局上下文向量，我们学习整个图的单一嵌入。</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412151708305.png" alt="image-20241215170814254"></p>
+<blockquote>
+<p>一个简单 GNN 的单层。图是输入，每个组件（V,E,U）通过 MLP 更新以生成新的图。每个函数下标表示 GNN 模型第 n 层不同图属性的独立函数。</p>
+</blockquote>
+<p>​	和其他的神经网络模块或者层的常见情况一样，我们可以将这些图神经网络堆叠在一起。</p>
+<p>​	因为图神经网络（GNN）不会更新输入图的连接性，所以我们可以用与输入图相同的邻接表和相同数量的特征向量来描述 GNN 的输出图。但是，输出图具有更新的嵌入，因为 GNN 已经更新了每个节点、边和全局上下文表示。</p>
+<p>​	现在我们可以构建一个简单的 GNN 模型，并通过在图的不同部分之间路由信息来进行二元预测。这种池化技术将作为构建更复杂 GNN 模型的基石。如果我们有新的图属性，我们只需定义如何从一个属性传递信息到另一个属性。</p>
+<h1 id="GNN在供应链中的应用"><a href="#GNN在供应链中的应用" class="headerlink" title="GNN在供应链中的应用"></a><span id="GNNInSupplyChain">GNN在供应链中的应用<span></h1><h2 id="供应链与GNN"><a href="#供应链与GNN" class="headerlink" title="供应链与GNN"></a>供应链与GNN</h2><p>​	供应链是一个动态的组织网络，这些组织参与各种过程和活动，通过上下游的链接为消费者生产以产品和服务形式的价值，涉及信息、商品和资金在其各个阶段的持续流动。由于供应链由复杂网络中的相互连接实体组成，它涉及复杂的相互依赖和决策过程。此外，现代供应链产生大量数据，实体之间的关系和依赖需要复杂的模型来捕捉。使用计算方法解决供应链问题的潜在好处包括提高协调性、高效物流和有效的供应链解决方案。</p>
+<p>​	例如下图：供应链作为相互连接的公司、产品、分销商和客户的图。</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202412161345113.png" alt="image-20241216134516991"></p>
+<p>​	GNN在研究领域用于知识图谱推理和异常检测。它们的优势在于有效地捕捉非欧几里得数据中的依赖关系，使它们适用于涉及连接实体的任务。与供应链相连，GNNs 可以实现对供应链中复杂关系和依赖关系的建模，促进销售预测、生产计划、风险评估和揭示潜在风险等任务。 通过利用图神经网络方法，可以优化供应链运营，增强风险管理，并通过从图数据中提取相关信息和推断多种类型的隐藏关系风险来改善决策过程。</p>
+
     </div>
 
     
@@ -294,9 +340,8 @@
 </div>
 
           <div class="post-tags">
-              <a href="/tags/GNN-Learning/" rel="tag"># GNN_Learning</a>
+              <a href="/tags/GNN/" rel="tag"># GNN</a>
               <a href="/tags/AI/" rel="tag"># AI</a>
-              <a href="/tags/%E5%9B%BE%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" rel="tag"># 图神经网络</a>
           </div>
 
         
@@ -308,6 +353,9 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2024/12/06/%E7%94%9F%E6%88%90%E5%BC%8FAI%E6%A8%A1%E5%9E%8B%E5%AE%9E%E7%8E%B0MNIST%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA/" rel="next" title="生成式AI模型实现MNIST数据增强">
+                  生成式AI模型实现MNIST数据增强 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
@@ -381,7 +429,7 @@
 
   
 
-  <script class="next-config" data-name="enableMath" type="application/json">false</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
 <script src="/js/third-party/math/mathjax.js"></script>
 
 
