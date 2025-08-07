@@ -1,6 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>UE5引擎源码版编译和Windows版本打包</title>
+    <url>/2024/11/20/UE5%E5%BC%95%E6%93%8E%E6%BA%90%E7%A0%81%E7%89%88%E7%BC%96%E8%AF%91%E5%92%8CWindows%E7%89%88%E6%9C%AC%E6%89%93%E5%8C%85/</url>
+    <content><![CDATA[<h1 id="读前须知"><a href="#读前须知" class="headerlink" title="读前须知"></a>读前须知</h1><hr>
+<p>​	这里先贴出来<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/downloading-unreal-engine-source-code?application_version=5.4">Unreal Engine</a>的官方安装文档，本人就是跟着官方文档做的。这篇文章作为个人搭建记录和XX公司课程的作业提交。课程中网络相关问题均未提到，如果访问某些网站出现困难那么请自己寻求魔法。本文章目前只有windows版本的教程，mac和Linux的教程在我文章中提到的官方文档里均有提到。</p>
+<h1 id="访问得到Github上的虚幻引擎的源代码"><a href="#访问得到Github上的虚幻引擎的源代码" class="headerlink" title="访问得到Github上的虚幻引擎的源代码"></a>访问得到Github上的虚幻引擎的源代码</h1><p>​	首先就是要有一个<a href="https://github.com/">GitHub</a>账号，没有的话要去注册一个。然后你可以看一下你的账号的profile中的Organizations中有没有epic这个标志，</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121004251563.png" alt="image-20241121004251563"></p>
+<p>​	如果没有这个标志那么可以去<a href="https://www.unrealengine.com/zh-CN">Epic Games</a>登录然后在右上角可以点开自己的头像然后打开账户。要不然的话你点开UnrealEngine的源码仓库会出现访问404。</p>
+<img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121002301539.png" alt="image-20241121002301539" style="zoom:;" />
+
+<p>​	然后在左面点开应用与账户再点开右面的Github然后选择连接，按照操作进行关联就可以了。然后按照道理来说GitHub会发送邮件邀请你加入GitHub上的@EpicGames组织。你必须在7天内点击邮件内的 加入@EpicGames（Join @EpicGames） 按钮，才能完成GitHub与Epic Games账号的关联流程。但是我<strong>没有</strong>收到这份邮件，这个时候你不要急你等个几分钟然后去<a href="https://github.com/EpicGames">EpicGame的Github主页</a>这个时候你的页面上方应该会有一个消息提示其邀请你加入到Organizations中。如果没看见忘记点了也没事多刷新几次。</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121002700384.png" alt="image-20241121002700384"></p>
+<p>​	等你加进组织之后再次访问就不会显示404了。然后你就可以进入到<a href="https://github.com/EpicGames/UnrealEngine">EpicGame的UnrealEngine仓库</a>中访问到Github上的虚幻引擎的源代码了。</p>
+<h1 id="安装Visual-Studio-2022"><a href="#安装Visual-Studio-2022" class="headerlink" title="安装Visual Studio 2022"></a>安装Visual Studio 2022</h1><p>​	安装Visual Studio2022主要是用来编译和提供相关依赖。首先第一步访问<a href="https://visualstudio.microsoft.com/zh-hans/">VS</a>的官网然后点击下载Visual Studio安装程序，点开后选择我下图所展示的依赖点上：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121125914604.png" alt="image-20241121125914604"></p>
+<hr>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121125940979.png" alt="image-20241121125940979"></p>
+<p>​	这一步官方也有详细文档指导，请点击这里：<a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.4">UE5相关VS安装指导</a>，如果你在之后遇到相关问题记得回来检查版本是否匹配，截至这篇post提交时，官方版本匹配指导见下图：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121130715320.png" alt="image-20241121130715320"></p>
+<p>​	另外vs还可以安装自己喜欢的插件和主题，然后自己也可以进行各种设置外观等，这些我就不在这里赘述了，想要搞得自己可以慢慢调教。</p>
+<h1 id="下载源码并且进行初始化"><a href="#下载源码并且进行初始化" class="headerlink" title="下载源码并且进行初始化"></a>下载源码并且进行初始化</h1><p>​	下载源码有多种方式可以直接对于指定的branch进行clone，也可以直接下载zip压缩包解压。</p>
+<h2 id="clone方法"><a href="#clone方法" class="headerlink" title="clone方法"></a>clone方法</h2><p>​	首先要确保你的电脑安装了git，并且你的GitHub上已经绑定了你的本地git的ssh公钥，直接在你想要装Unreal Engine的目录中打开控制台然后输入以下命令</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 1 --branch 5.4 git@github.com:EpicGames/UnrealEngine.git</span><br></pre></td></tr></table></figure>
+
+<h2 id="下载zip压缩包"><a href="#下载zip压缩包" class="headerlink" title="下载zip压缩包"></a>下载zip压缩包</h2><p>​	直接点击我的右面这个连接：<a href="https://github.com/EpicGames/UnrealEngine/releases">点我</a>，就可以进到UE的Releases的界面了，然后找到你想要下载的版本点开Assets点击Source code(zip)，msi后缀的是win上的安装包。然后就可以进行下载了，当下载完后直接解压就行。例如像我下图所示（推荐下载有发行版的releases一般来说会比较稳定）：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121132853132.png" alt="image-20241121132853132"></p>
+<p>​	当做到这里的时候你应该已经获得了源码了（差不多有2个GB）。</p>
+<h2 id="下载二进制文件等和开始编译"><a href="#下载二进制文件等和开始编译" class="headerlink" title="下载二进制文件等和开始编译"></a>下载二进制文件等和开始编译</h2><ol>
+<li><p>在资源管理器中打开你的源代码文件夹，并运行 <code>Setup.bat</code>。</p>
+<p>这样将下载引擎的二进制内容和先决程序，并设置虚幻文件关联。 在Windows 8上，可能会显示SmartScreen警告。请依次单击 <strong>更多信息</strong> 和 <strong>Run anyway</strong> 以继续。</p>
+<p>引擎二进制文件的完整下载包需要一些时间（差不多20个GB）才能完成下载。 后续检出只需要下载增量部分，速度将会大幅提高。</p>
+</li>
+<li><p>运行 <code>GenerateProjectFiles.bat</code> 来为引擎创建项目文件。这个过程应该不超过一分钟即可完成。</p>
+</li>
+<li><p>双击 <code>UE5.sln</code> 文件以将项目加载到Visual Studio中。将你的解决方案配置设置为 <strong>开发编辑器</strong>，将解决方案平台设置为 <strong>Win64</strong>，然后右键单击 <strong>UE</strong> 目标并选择 <strong>构建</strong>。大概需要10-40分钟完成编译，具体取决于系统规格。这里我的电脑编译了有1个多小时差不多，反正就是很耗时了，对电脑的CPU和内存有较大要求，CPU越强时间越短。</p>
+</li>
+<li><p>编译完成后，可以将启动项目设置为 <strong>UE5</strong> 并按 <strong>F5</strong> 进行调试，以便从Visual Studio加载编辑器。</p>
+<p><strong>（请一定确保按照操作进行操作，否则会损失很多时间）</strong></p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121133941806.png" alt="image-20241121133941806"></p>
+</li>
+</ol>
+<h1 id="创建UE5工程并且开始打包"><a href="#创建UE5工程并且开始打包" class="headerlink" title="创建UE5工程并且开始打包"></a>创建UE5工程并且开始打包</h1><p>​	当你第一次打开UE客户端的时候因为需要进行着色所以的话会很耗时，然后打开客户端进行创建项目，注意以下几个点，项目名称最好别用中文，最好用英文。</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134504003.png" alt="image-20241121134504003"></p>
+<h2 id="Windows平台打包"><a href="#Windows平台打包" class="headerlink" title="Windows平台打包"></a>Windows平台打包</h2><p>​	然后像下图一样就可以进行游戏的初次打包了：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134620003.png" alt="image-20241121134620003"></p>
+<h2 id="Android平台打包"><a href="#Android平台打包" class="headerlink" title="Android平台打包"></a>Android平台打包</h2><p>如果想要进行Android平台的打包记得要下载Android Studio进行SDK和NDK的安装，还有就是JAVA的SDK也是需要的一定要注意一下自己有没有安装相关工具链，如果安装成功了应该是我这个样子的：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134916922.png" alt="image-20241121134916922"></p>
+<p>​	如果没有安装的话可以看一下这个链接：<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine">点我</a>，这个官方文档有着详细的说明。</p>
+<h1 id="打包成果展示"><a href="#打包成果展示" class="headerlink" title="打包成果展示"></a>打包成果展示</h1><p>经过一段时间的编译然后就生成了如下图所示的打包成果：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121174901797.png" alt="image-20241121174901797"></p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121175156226.png" alt="image-20241121175156226"></p>
+<p>实机运行效果如图所示：</p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121175125192.png" alt="image-20241121175125192"></p>
+<p>​	现在你成功制作了你自己的第一款游戏，具有逼真的物理模拟和极高的画质上限，现在你也可以叫自己为游戏制作工程师了~😍！</p>
+<p>​	本教程到这里就结束了，如果还有什么问题可以在下面留言评论。</p>
+]]></content>
+      <categories>
+        <category>UE5</category>
+      </categories>
+      <tags>
+        <tag>UE5</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>GNN_Learing</title>
     <url>/2024/11/25/GNN-Learing/</url>
     <content><![CDATA[<h1 id="文档说明："><a href="#文档说明：" class="headerlink" title="文档说明："></a>文档说明：</h1><p>​	我本身的研究方向就是利用<strong>GNN（图神经网络 Graph neural network）</strong>解决<code>软件运维问题/产业链风险问题</code>的，这篇文章就主要是偏向于技术报告似的学习文章，同时也包含一些相关的实验作为支撑。本文章主要以供应链来为例进行说明GNN在供应链等现实实例上面的具体应用方法。</p>
@@ -801,66 +864,35 @@
       </tags>
   </entry>
   <entry>
-    <title>UE5引擎源码版编译和Windows版本打包</title>
-    <url>/2024/11/20/UE5%E5%BC%95%E6%93%8E%E6%BA%90%E7%A0%81%E7%89%88%E7%BC%96%E8%AF%91%E5%92%8CWindows%E7%89%88%E6%9C%AC%E6%89%93%E5%8C%85/</url>
-    <content><![CDATA[<h1 id="读前须知"><a href="#读前须知" class="headerlink" title="读前须知"></a>读前须知</h1><hr>
-<p>​	这里先贴出来<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/downloading-unreal-engine-source-code?application_version=5.4">Unreal Engine</a>的官方安装文档，本人就是跟着官方文档做的。这篇文章作为个人搭建记录和XX公司课程的作业提交。课程中网络相关问题均未提到，如果访问某些网站出现困难那么请自己寻求魔法。本文章目前只有windows版本的教程，mac和Linux的教程在我文章中提到的官方文档里均有提到。</p>
-<h1 id="访问得到Github上的虚幻引擎的源代码"><a href="#访问得到Github上的虚幻引擎的源代码" class="headerlink" title="访问得到Github上的虚幻引擎的源代码"></a>访问得到Github上的虚幻引擎的源代码</h1><p>​	首先就是要有一个<a href="https://github.com/">GitHub</a>账号，没有的话要去注册一个。然后你可以看一下你的账号的profile中的Organizations中有没有epic这个标志，</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121004251563.png" alt="image-20241121004251563"></p>
-<p>​	如果没有这个标志那么可以去<a href="https://www.unrealengine.com/zh-CN">Epic Games</a>登录然后在右上角可以点开自己的头像然后打开账户。要不然的话你点开UnrealEngine的源码仓库会出现访问404。</p>
-<img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121002301539.png" alt="image-20241121002301539" style="zoom:;" />
+    <title>高并发缓存系统</title>
+    <url>/2025/07/15/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%BC%93%E5%AD%98%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p>github地址： <a href="https://github.com/jianingdai/my_cache">https://github.com/jianingdai/my_cache</a></p>
+<h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>在项目目录使用以下命令可以进行测试运行</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">go run test.go</span><br></pre></td></tr></table></figure>
 
-<p>​	然后在左面点开应用与账户再点开右面的Github然后选择连接，按照操作进行关联就可以了。然后按照道理来说GitHub会发送邮件邀请你加入GitHub上的@EpicGames组织。你必须在7天内点击邮件内的 加入@EpicGames（Join @EpicGames） 按钮，才能完成GitHub与Epic Games账号的关联流程。但是我<strong>没有</strong>收到这份邮件，这个时候你不要急你等个几分钟然后去<a href="https://github.com/EpicGames">EpicGame的Github主页</a>这个时候你的页面上方应该会有一个消息提示其邀请你加入到Organizations中。如果没看见忘记点了也没事多刷新几次。</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121002700384.png" alt="image-20241121002700384"></p>
-<p>​	等你加进组织之后再次访问就不会显示404了。然后你就可以进入到<a href="https://github.com/EpicGames/UnrealEngine">EpicGame的UnrealEngine仓库</a>中访问到Github上的虚幻引擎的源代码了。</p>
-<h1 id="安装Visual-Studio-2022"><a href="#安装Visual-Studio-2022" class="headerlink" title="安装Visual Studio 2022"></a>安装Visual Studio 2022</h1><p>​	安装Visual Studio2022主要是用来编译和提供相关依赖。首先第一步访问<a href="https://visualstudio.microsoft.com/zh-hans/">VS</a>的官网然后点击下载Visual Studio安装程序，点开后选择我下图所展示的依赖点上：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121125914604.png" alt="image-20241121125914604"></p>
-<hr>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121125940979.png" alt="image-20241121125940979"></p>
-<p>​	这一步官方也有详细文档指导，请点击这里：<a href="https://dev.epicgames.com/documentation/en-us/unreal-engine/setting-up-visual-studio-development-environment-for-cplusplus-projects-in-unreal-engine?application_version=5.4">UE5相关VS安装指导</a>，如果你在之后遇到相关问题记得回来检查版本是否匹配，截至这篇post提交时，官方版本匹配指导见下图：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121130715320.png" alt="image-20241121130715320"></p>
-<p>​	另外vs还可以安装自己喜欢的插件和主题，然后自己也可以进行各种设置外观等，这些我就不在这里赘述了，想要搞得自己可以慢慢调教。</p>
-<h1 id="下载源码并且进行初始化"><a href="#下载源码并且进行初始化" class="headerlink" title="下载源码并且进行初始化"></a>下载源码并且进行初始化</h1><p>​	下载源码有多种方式可以直接对于指定的branch进行clone，也可以直接下载zip压缩包解压。</p>
-<h2 id="clone方法"><a href="#clone方法" class="headerlink" title="clone方法"></a>clone方法</h2><p>​	首先要确保你的电脑安装了git，并且你的GitHub上已经绑定了你的本地git的ssh公钥，直接在你想要装Unreal Engine的目录中打开控制台然后输入以下命令</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> --depth 1 --branch 5.4 git@github.com:EpicGames/UnrealEngine.git</span><br></pre></td></tr></table></figure>
 
-<h2 id="下载zip压缩包"><a href="#下载zip压缩包" class="headerlink" title="下载zip压缩包"></a>下载zip压缩包</h2><p>​	直接点击我的右面这个连接：<a href="https://github.com/EpicGames/UnrealEngine/releases">点我</a>，就可以进到UE的Releases的界面了，然后找到你想要下载的版本点开Assets点击Source code(zip)，msi后缀的是win上的安装包。然后就可以进行下载了，当下载完后直接解压就行。例如像我下图所示（推荐下载有发行版的releases一般来说会比较稳定）：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121132853132.png" alt="image-20241121132853132"></p>
-<p>​	当做到这里的时候你应该已经获得了源码了（差不多有2个GB）。</p>
-<h2 id="下载二进制文件等和开始编译"><a href="#下载二进制文件等和开始编译" class="headerlink" title="下载二进制文件等和开始编译"></a>下载二进制文件等和开始编译</h2><ol>
-<li><p>在资源管理器中打开你的源代码文件夹，并运行 <code>Setup.bat</code>。</p>
-<p>这样将下载引擎的二进制内容和先决程序，并设置虚幻文件关联。 在Windows 8上，可能会显示SmartScreen警告。请依次单击 <strong>更多信息</strong> 和 <strong>Run anyway</strong> 以继续。</p>
-<p>引擎二进制文件的完整下载包需要一些时间（差不多20个GB）才能完成下载。 后续检出只需要下载增量部分，速度将会大幅提高。</p>
-</li>
-<li><p>运行 <code>GenerateProjectFiles.bat</code> 来为引擎创建项目文件。这个过程应该不超过一分钟即可完成。</p>
-</li>
-<li><p>双击 <code>UE5.sln</code> 文件以将项目加载到Visual Studio中。将你的解决方案配置设置为 <strong>开发编辑器</strong>，将解决方案平台设置为 <strong>Win64</strong>，然后右键单击 <strong>UE</strong> 目标并选择 <strong>构建</strong>。大概需要10-40分钟完成编译，具体取决于系统规格。这里我的电脑编译了有1个多小时差不多，反正就是很耗时了，对电脑的CPU和内存有较大要求，CPU越强时间越短。</p>
-</li>
-<li><p>编译完成后，可以将启动项目设置为 <strong>UE5</strong> 并按 <strong>F5</strong> 进行调试，以便从Visual Studio加载编辑器。</p>
-<p><strong>（请一定确保按照操作进行操作，否则会损失很多时间）</strong></p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121133941806.png" alt="image-20241121133941806"></p>
-</li>
+
+<p>项目实现了基础功能，以后可以进一步开发定制化功能</p>
+<p><strong>目前只开发基础功能和接口可供其他相关项目使用相关接口或者完善现在还处于一个demo状态，待未来可以慢慢完善扩增。</strong></p>
+<h2 id="项目描述"><a href="#项目描述" class="headerlink" title="项目描述"></a>项目描述</h2><p>实现一个高性能的内存缓存系统，支持多种数据结构、过期策略、持久化等功能。</p>
+<p><strong><del>仿redis</del></strong></p>
+<h2 id="功能要求"><a href="#功能要求" class="headerlink" title="功能要求"></a>功能要求</h2><ol>
+<li><strong>数据结构</strong>：支持字符串、列表、哈希表、集合</li>
+<li><strong>过期策略</strong>：TTL、LRU、LFU等多种过期策略</li>
+<li><strong>持久化</strong>：支持AOF和RDB持久化</li>
+<li><strong>主从复制</strong>：支持主从同步</li>
+<li><strong>事务支持</strong>：支持原子性操作</li>
+<li><strong>集群模式</strong>：支持数据分片和故障转移</li>
+<li><strong>监控统计</strong>：提供详细的性能指标</li>
 </ol>
-<h1 id="创建UE5工程并且开始打包"><a href="#创建UE5工程并且开始打包" class="headerlink" title="创建UE5工程并且开始打包"></a>创建UE5工程并且开始打包</h1><p>​	当你第一次打开UE客户端的时候因为需要进行着色所以的话会很耗时，然后打开客户端进行创建项目，注意以下几个点，项目名称最好别用中文，最好用英文。</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134504003.png" alt="image-20241121134504003"></p>
-<h2 id="Windows平台打包"><a href="#Windows平台打包" class="headerlink" title="Windows平台打包"></a>Windows平台打包</h2><p>​	然后像下图一样就可以进行游戏的初次打包了：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134620003.png" alt="image-20241121134620003"></p>
-<h2 id="Android平台打包"><a href="#Android平台打包" class="headerlink" title="Android平台打包"></a>Android平台打包</h2><p>如果想要进行Android平台的打包记得要下载Android Studio进行SDK和NDK的安装，还有就是JAVA的SDK也是需要的一定要注意一下自己有没有安装相关工具链，如果安装成功了应该是我这个样子的：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121134916922.png" alt="image-20241121134916922"></p>
-<p>​	如果没有安装的话可以看一下这个链接：<a href="https://dev.epicgames.com/documentation/zh-cn/unreal-engine/set-up-android-sdk-ndk-and-android-studio-using-turnkey-for-unreal-engine">点我</a>，这个官方文档有着详细的说明。</p>
-<h1 id="打包成果展示"><a href="#打包成果展示" class="headerlink" title="打包成果展示"></a>打包成果展示</h1><p>经过一段时间的编译然后就生成了如下图所示的打包成果：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121174901797.png" alt="image-20241121174901797"></p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121175156226.png" alt="image-20241121175156226"></p>
-<p>实机运行效果如图所示：</p>
-<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/imgimage-20241121175125192.png" alt="image-20241121175125192"></p>
-<p>​	现在你成功制作了你自己的第一款游戏，具有逼真的物理模拟和极高的画质上限，现在你也可以叫自己为游戏制作工程师了~😍！</p>
-<p>​	本教程到这里就结束了，如果还有什么问题可以在下面留言评论。</p>
 ]]></content>
       <categories>
-        <category>UE5</category>
+        <category>后端开发</category>
+        <category>Golang</category>
       </categories>
       <tags>
-        <tag>UE5</tag>
+        <tag>后端开发</tag>
+        <tag>Golang</tag>
       </tags>
   </entry>
   <entry>
@@ -1206,27 +1238,434 @@
       </tags>
   </entry>
   <entry>
-    <title>高并发缓存系统</title>
-    <url>/2025/07/15/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%BC%93%E5%AD%98%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[<h2 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h2><p>github地址： <a href="https://github.com/jianingdai/my_cache">https://github.com/jianingdai/my_cache</a></p>
-<h2 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h2><p>在项目目录使用以下命令可以进行测试运行</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">go run test.go</span><br></pre></td></tr></table></figure>
-
-
-
-<p>项目实现了基础功能，以后可以进一步开发定制化功能</p>
-<p><strong>目前只开发基础功能和接口可供其他相关项目使用相关接口或者完善现在还处于一个demo状态，待未来可以慢慢完善扩增。</strong></p>
-<h2 id="项目描述"><a href="#项目描述" class="headerlink" title="项目描述"></a>项目描述</h2><p>实现一个高性能的内存缓存系统，支持多种数据结构、过期策略、持久化等功能。</p>
-<p><strong><del>仿redis</del></strong></p>
-<h2 id="功能要求"><a href="#功能要求" class="headerlink" title="功能要求"></a>功能要求</h2><ol>
-<li><strong>数据结构</strong>：支持字符串、列表、哈希表、集合</li>
-<li><strong>过期策略</strong>：TTL、LRU、LFU等多种过期策略</li>
-<li><strong>持久化</strong>：支持AOF和RDB持久化</li>
-<li><strong>主从复制</strong>：支持主从同步</li>
-<li><strong>事务支持</strong>：支持原子性操作</li>
-<li><strong>集群模式</strong>：支持数据分片和故障转移</li>
-<li><strong>监控统计</strong>：提供详细的性能指标</li>
+    <title>微服务_gRPC与Protobuf</title>
+    <url>/2025/08/06/%E5%BE%AE%E6%9C%8D%E5%8A%A1-gRPC%E4%B8%8EProtobuf/</url>
+    <content><![CDATA[<h1 id="微服务与-RPC-概述"><a href="#微服务与-RPC-概述" class="headerlink" title="微服务与 RPC 概述"></a>微服务与 RPC 概述</h1><h2 id="什么是微服务？"><a href="#什么是微服务？" class="headerlink" title="什么是微服务？"></a>什么是微服务？</h2><p>微服务是一种软件架构风格，它将应用程序构建为一组小型、独立的服务。每个服务：</p>
+<ul>
+<li>运行在自己的进程中</li>
+<li>围绕业务功能构建</li>
+<li>能够独立部署</li>
+<li>通过轻量级机制（通常是 HTTP&#x2F;RPC）通信</li>
+</ul>
+<h3 id="微服务的优势"><a href="#微服务的优势" class="headerlink" title="微服务的优势"></a>微服务的优势</h3><ol>
+<li><strong>独立开发和部署</strong><ul>
+<li>不同团队可以独立开发不同服务</li>
+<li>服务可以使用最适合的技术栈</li>
+<li>可以独立部署和扩展，客户端不用关注服务端实现细节。</li>
+</ul>
+</li>
+<li><strong>故障隔离</strong><ul>
+<li>单个服务故障不会导致整个系统崩溃（例如：文档中图片服务异常，不影响正常的文档编辑）</li>
+<li>更容易进行故障排查和修复</li>
+<li>系统更具弹性，服务可以独立扩缩容（例如：签到服务，遇到紧急运营活动，可以独立扩缩容）</li>
+</ul>
+</li>
 </ol>
+<h3 id="微服务面临的挑战"><a href="#微服务面临的挑战" class="headerlink" title="微服务面临的挑战"></a>微服务面临的挑战</h3><ol>
+<li><p><strong>服务间通信</strong></p>
+<ul>
+<li>需要处理网络延迟（例如：网络抖动，导致请求超时）</li>
+<li>要考虑服务发现，就是要知道对方服务在哪台机器上</li>
+<li>需要处理部分失败，就是对方服务可能挂了，需要有重试机制</li>
+</ul>
+</li>
+<li><p><strong>运维复杂性</strong></p>
+<ul>
+<li>服务数量增多</li>
+<li>部署和监控更复杂</li>
+<li>需要更好的运维工具</li>
+</ul>
+<blockquote>
+<p>微服务的粒度要合理设计，不是越细越好，也不是越粗越好。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="微服务与-RPC-的关系"><a href="#微服务与-RPC-的关系" class="headerlink" title="微服务与 RPC 的关系"></a>微服务与 RPC 的关系</h2><p>在微服务架构中，RPC（远程过程调用）扮演着关键角色：</p>
+<ol>
+<li><strong>服务间通信</strong><ul>
+<li>RPC 提供了服务间通信的标准方式</li>
+<li>使远程服务调用像本地调用一样简单</li>
+<li>处理网络通信的复杂性</li>
+</ul>
+</li>
+<li><strong>接口定义</strong><ul>
+<li>RPC 框架（如 gRPC）提供接口定义语言</li>
+<li>清晰定义服务间的契约</li>
+<li>支持多语言代码生成</li>
+</ul>
+</li>
+<li><strong>性能优化</strong><ul>
+<li>二进制协议提高传输效率</li>
+<li>支持连接复用</li>
+<li>提供流式传输能力</li>
+</ul>
+</li>
+<li><strong>可靠性保证</strong><ul>
+<li>内置重试机制</li>
+<li>提供超时控制</li>
+<li>支持负载均衡</li>
+</ul>
+</li>
+</ol>
+<h1 id="RPC-与-gRPC-基础"><a href="#RPC-与-gRPC-基础" class="headerlink" title="RPC 与 gRPC 基础"></a>RPC 与 gRPC 基础</h1><h2 id="什么是-RPC？"><a href="#什么是-RPC？" class="headerlink" title="什么是 RPC？"></a>什么是 RPC？</h2><p>远程过程调用(Remote Procedure Call, RPC)是一种分布式计算的通信协议，允许程序调用另一个地址空间(通常是网络上的另一台计算机)的函数或方法，就像调用本地函数一样。</p>
+<p><strong>RPC（Remote Procedure Call）</strong> 的意思是：</p>
+<blockquote>
+<p><strong>“像调用本地函数一样，去调用远程服务器上的函数。”</strong></p>
+</blockquote>
+<p><strong>举例：</strong></p>
+<p>你写了一个函数 <code>add(a, b)</code> 来求两个数之和。你在本地这样写：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">result := add(<span class="number">1</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<p>RPC 让你可以这样调用远程服务器上的 <code>add</code> 函数，<strong>看起来就像是本地函数，但其实它在网络另一端执行。</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">你（客户端）               网络               服务器</span><br><span class="line">   |                                            |</span><br><span class="line">   |--- 调用 add(1, 2) ------------------------&gt;|</span><br><span class="line">   |                                            |</span><br><span class="line">   |&lt;---------- 返回结果 3 ---------------------|</span><br></pre></td></tr></table></figure>
+
+<h2 id="为什么用-RPC？"><a href="#为什么用-RPC？" class="headerlink" title="为什么用 RPC？"></a>为什么用 RPC？</h2><ol>
+<li>RPC 框架封装了复杂的网络请求逻辑，让你用函数方式去调用远程服务。</li>
+<li>微服务架构中，服务之间通过 RPC 通信，可以提高系统的可扩展性和可维护性。</li>
+</ol>
+<h2 id="RPC-和-HTTP-有啥区别？"><a href="#RPC-和-HTTP-有啥区别？" class="headerlink" title="RPC 和 HTTP 有啥区别？"></a>RPC 和 HTTP 有啥区别？</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>RPC</th>
+<th>HTTP API</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>调用方式</td>
+<td>像调用函数</td>
+<td>像访问 URL</td>
+</tr>
+<tr>
+<td>数据格式</td>
+<td>二进制（如 protobuf）</td>
+<td>一般是 JSON 或者表单数据</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>通常更高（小体积、低延迟）</td>
+<td>相对较低</td>
+</tr>
+<tr>
+<td>接口定义</td>
+<td>使用 <code>.proto</code> 或 IDL 文件</td>
+<td>通常用 OpenAPI、Swagger 等或者文档</td>
+</tr>
+</tbody></table>
+<h2 id="RPC-的基本工作流程"><a href="#RPC-的基本工作流程" class="headerlink" title="RPC 的基本工作流程"></a>RPC 的基本工作流程</h2><figure class="highlight text"><table><tr><td class="code"><pre><span class="line">你（客户端）               网络               服务器</span><br><span class="line">   |                                            |</span><br><span class="line">   |--- 调用 add(1, 2) ------------------------&gt;|</span><br><span class="line">   |                                            |</span><br><span class="line">   |&lt;---------- 返回结果 3 ---------------------|</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><strong>客户端调用</strong>：客户端调用本地函数</li>
+<li><strong>参数序列化</strong>：客户端将参数打包(序列化)，也就是将参数转换为二进制数据</li>
+<li><strong>网络传输</strong>：二进制数据通过网络发送到服务端</li>
+<li><strong>参数反序列化</strong>：服务端将二进制数据转换为参数。参数包含函数名、参数值、参数类型等。</li>
+<li><strong>执行调用</strong>：反序列化后，服务端知道客户端想调用哪个函数，直接执行实际函数，并返回结果（结构体数据）</li>
+<li><strong>结果序列化</strong>：服务端将结果（结构体数据）打包，也就是将结果转换为二进制数据</li>
+<li><strong>网络传输</strong>：二进制数据通过网络发送回客户端</li>
+<li><strong>结果反序列化</strong>：客户端解包结果数据，也就是将二进制数据转换为结构体数据。</li>
+<li><strong>返回结果</strong>：客户端程序获得结构体数据，也就是获得函数返回值。</li>
+</ol>
+<h2 id="常见的-RPC-框架"><a href="#常见的-RPC-框架" class="headerlink" title="常见的 RPC 框架"></a>常见的 RPC 框架</h2><table>
+<thead>
+<tr>
+<th>框架</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>gRPC</td>
+<td>Google 出品，支持多语言、基于 HTTP&#x2F;2 和 protobuf</td>
+</tr>
+<tr>
+<td>Thrift</td>
+<td>Facebook 出品，灵活多语言</td>
+</tr>
+<tr>
+<td>Dubbo</td>
+<td>阿里出品，主要用于 Java 服务</td>
+</tr>
+<tr>
+<td>JSON-RPC</td>
+<td>使用 JSON 格式传输</td>
+</tr>
+</tbody></table>
+<h3 id="微服务要解决的主要问题"><a href="#微服务要解决的主要问题" class="headerlink" title="微服务要解决的主要问题"></a>微服务要解决的主要问题</h3><ul>
+<li>服务注册与发现（要知道对方在哪）</li>
+<li>数据传输</li>
+</ul>
+<h2 id="数据传输：为什么需要编解码？"><a href="#数据传输：为什么需要编解码？" class="headerlink" title="数据传输：为什么需要编解码？"></a>数据传输：为什么需要编解码？</h2><h3 id="JSON-数据的问题"><a href="#JSON-数据的问题" class="headerlink" title="JSON 数据的问题"></a>JSON 数据的问题</h3><p>JSON确实可以作为RPC场景下的数据传输方案。</p>
+<ol>
+<li>体积大</li>
+<li>解析慢</li>
+<li>针对二进制数据，没有很好的解决方案。</li>
+</ol>
+<h3 id="二进制数据的问题"><a href="#二进制数据的问题" class="headerlink" title="二进制数据的问题"></a>二进制数据的问题</h3><p>在上面的 RPC 工作流程中，我们可以看到序列化（编码）和反序列化（解码）是非常重要的步骤。那么为什么需要编解码呢？在分布式系统和网络通信中，编解码（序列化和反序列化）解决了以下关键问题：</p>
+<ol>
+<li><strong>数据传输问题</strong><ul>
+<li>计算机内存中的数据结构（如对象、数组）无法直接在网络上传输</li>
+<li>不同编程语言的数据表示方式不同</li>
+<li>网络传输只能传输字节流，需要将复杂数据结构转换为字节序列</li>
+</ul>
+</li>
+<li><strong>跨语言通信问题</strong><ul>
+<li>Java、Go、Python 等语言的数据类型实现方式不同</li>
+<li>编解码提供了一种统一的数据交换格式</li>
+<li>使不同语言编写的系统能够相互通信</li>
+</ul>
+</li>
+<li><strong>数据存储问题</strong><ul>
+<li>内存中的数据结构需要持久化到磁盘</li>
+<li>数据库存储需要将对象转换为可存储的格式</li>
+<li>编解码提供了数据持久化的标准方式</li>
+</ul>
+</li>
+<li><strong>性能优化</strong><ul>
+<li>减少网络传输的数据量</li>
+<li>提高数据处理速度</li>
+<li>节省存储空间</li>
+</ul>
+</li>
+<li><strong>版本兼容问题</strong><ul>
+<li>数据结构随时间演进</li>
+<li>需要保持向前和向后兼容</li>
+<li>编解码协议（如 Protobuf）提供了版本兼容机制</li>
+</ul>
+</li>
+</ol>
+<h1 id="Protocol-Buffers-详解"><a href="#Protocol-Buffers-详解" class="headerlink" title="Protocol Buffers 详解"></a>Protocol Buffers 详解</h1><p>ProtoBuffer 是 Google 的语言中立、平台中立、可扩展的结构化数据序列化机制</p>
+<h2 id="Protobuf-背景与优势"><a href="#Protobuf-背景与优势" class="headerlink" title="Protobuf 背景与优势"></a>Protobuf 背景与优势</h2><ul>
+<li><strong>诞生背景</strong>：Google 最初为内部分布式系统设计了一套高效的序列化格式，2008 年将其开源。设计目标是简单高效，生成的二进制数据比 XML 更小、更快。Protobuf 在 Google 内部广泛用于存储和交换结构化信息，并作为其 RPC 系统（即 gRPC 的前身）的基础。</li>
+</ul>
+<p>一个简单的 .proto 文件示例：</p>
+<figure class="highlight protobuf"><table><tr><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"><span class="keyword">package</span> example;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">Person</span> &#123;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">1</span>;</span><br><span class="line">  <span class="type">int32</span> id = <span class="number">2</span>;</span><br><span class="line">  <span class="type">float</span> height = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>Protobuf 优势</strong>：<ul>
+<li><strong>紧凑体积</strong>：二进制编码格式使消息体积远小于等价的 JSON&#x2F;XML 文本。例如，同一结构的数据，Protobuf 序列化后仅约 99 字节，而 JSON 约 214 字节，提高网络传输效率。</li>
+<li><strong>高性能</strong>：Protobuf 的序列化&#x2F;反序列化开销低。实测中，Protobuf 序列化时间约为 JSON 的一半（133ns 对比 249ns），反序列化优势更明显（294ns 对比 1457ns）。</li>
+<li><strong>严格模式与兼容性</strong>：通过 <code>.proto</code> 文件定义模式(schema)，Protobuf 强类型检查、明确字段编号和类型，使数据结构变化时可以平滑演进。新增字段时旧客户端可忽略不识别的字段（TLV 形式跳过未知字段），保证向前&#x2F;向后兼容。</li>
+<li><strong>多语言和代码生成</strong>：Protobuf 支持多种编程语言，可以用同一 <code>.proto</code> 定义生成各语言的数据访问类和 RPC 接口代码。这在异构微服务环境中非常有用，服务端和客户端可用不同语言开发。</li>
+<li><strong>额外注意</strong>：二进制格式可读性差于 JSON，但在追求性能和效率的场景下优势明显。</li>
+</ul>
+</li>
+</ul>
+<p><strong>示例性能对比</strong>：下表基于一个简单 <code>Person&#123;name, id, height&#125;</code> 示例进行的测试，比较了 Protobuf 与 JSON 的序列化结果和时间。可以看出，在体积和速度上，Protobuf 均优于 JSON。</p>
+<table>
+<thead>
+<tr>
+<th>编码格式</th>
+<th>序列化输出大小</th>
+<th>序列化时间</th>
+<th>反序列化时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Protobuf</strong></td>
+<td>99 字节</td>
+<td>133 纳秒</td>
+<td>294 纳秒</td>
+</tr>
+<tr>
+<td><strong>JSON</strong></td>
+<td>214 字节</td>
+<td>249 纳秒</td>
+<td>1457 纳秒</td>
+</tr>
+</tbody></table>
+<h2 id="编码与解码原理"><a href="#编码与解码原理" class="headerlink" title="编码与解码原理"></a>编码与解码原理</h2><h3 id="Varint-编码"><a href="#Varint-编码" class="headerlink" title="Varint 编码"></a>Varint 编码</h3><p>Varint 是一种可变长度整数编码方式，最大支持 64 位整数，用于将<strong>整数编码为变长字节序列</strong>。它通过将整数表示为一系列字节块，每个字节块的<strong>最高位表示是否继续</strong>，其余位表示数值。</p>
+<blockquote>
+<p>注意：1个字节8位，最高位是符号位，所以实际能表示的整数范围是0-127。</p>
+</blockquote>
+<p>对于整数、布尔、enum 等类型（Wire Type 0），Protobuf 采用可变长度整数（Varint）编码。较小的数字只占用少量字节，大数字占用更多字节。每个字节的最高位为“继续”标志位：若为 1 表示后续字节仍在，0 表示结束。下图中，将十进制数 300（<code>100101100₂</code>）拆分为两个 7 位块并添加续航位，最终编码成字节序列 <code>[172, 2]</code>。</p>
+<blockquote>
+<p>注意： Varint 是用的小端序，所以是反着读的。</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202508071003311.png" alt="image-20250807100352119"></p>
+<p><img src="https://raw.githubusercontent.com/jianingdai/Blog_img/main/img202508071004721.png" alt="image-20250807100414653"></p>
+<p><a href="https://zhuanlan.zhihu.com/p/84250836">详解varint编码原理</a></p>
+<p><strong>Protobuf 序列化原理</strong><br>Protobuf 序列化时，将每个消息视为一系列 <code>字段号+类型+值</code> 的键值对（Key-Value）组合。不过二进制流中不包含字段名、类型等描述信息，只有字段编号（Tag）和对应值，解码时必须借助 <code>.proto</code> 模式文件。具体原理包括：</p>
+<ul>
+<li><strong>Tag 编码</strong>：每个字段由字段号（field number）和 Wire Type（线束类型）共同决定一个 Tag 值。计算公式为：<code>Tag = (field_number &lt;&lt; 3) | wire_type</code>。<strong>Tag 本身以 Varint 格式编码</strong>。<br>字段编号与 Wire Type 组合生成 Tag（例如 <code>(1&lt;&lt;3|2)=10</code>）。</li>
+</ul>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">1000</span><br><span class="line">0010</span><br><span class="line">————</span><br><span class="line">1010</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>根据上图，字段号最大是15（想一下为什么？），所以字段号和wire type 可以共用一个字节。</p>
+</blockquote>
+<p>计算机根据 Tag 的值，可以知道字段号和类型。</p>
+<ul>
+<li><strong>Wire Type 分类</strong>：Protobuf 定义了几种基本的 Wire Type ：<ul>
+<li>**Varint (0)**：用于 <code>int32/64</code>、<code>uint32/64</code>、<code>sint32/64</code>、<code>bool</code>、<code>enum</code> 等整型和枚举类型。</li>
+<li>**64-bit (1)**：用于 <code>fixed64</code>、<code>sfixed64</code>、<code>double</code> 等 64 位定长类型。</li>
+<li>**Length-delimited (2)**：用于字符串、字节数组、嵌套消息以及打包的重复字段。长度使用 Varint 表示，然后紧跟实际内容字节。</li>
+<li>**32-bit (5)**：用于 <code>fixed32</code>、<code>sfixed32</code>、<code>float</code> 等 32 位定长类型。<br>（类型 3 和 4 预留用于分组，现已弃用。）</li>
+</ul>
+</li>
+<li><strong>TLV 结构</strong>：每个字段的序列化形式本质上是 <em>Tag-Length-Value</em> 格式：先编码 Tag，再编码值。对于 Length-delimited 类型，会额外先写入长度 Varint，再写入数据。这种设计使得解码器遇到未知字段时可以跳过，旧版本程序可忽略新字段。</li>
+<li><strong>模式依赖</strong>：Protobuf 编码流本身不包含字段名或类型信息，只由 <code>.proto</code> 描述文件定义的字段编号来识别每个字段，所以需要外部模式文件才能解读数据。这一点使得序列化结果高效紧凑，但也意味着 Protobuf 数据本身<strong>不可自描述</strong>，必须有匹配的模式才能解析。</li>
+</ul>
+<h2 id="Protobuf-序列化示例"><a href="#Protobuf-序列化示例" class="headerlink" title="Protobuf 序列化示例"></a>Protobuf 序列化示例</h2><p>在 <strong>Protocol Buffers（Protobuf）</strong> 中，<strong>字符串（<code>string</code>）类型是以长度前缀（length-prefixed）方式进行编码的</strong>。这种方式属于 <strong>wire type &#x3D; 2（length-delimited）</strong> 类型。下面是它的编码细节：</p>
+<h3 id="编码结构"><a href="#编码结构" class="headerlink" title="编码结构"></a>编码结构</h3><p>一个字符串字段的编码由以下三部分组成：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">[Tag][Length][Data]</span><br></pre></td></tr></table></figure>
+
+<h3 id="各部分说明："><a href="#各部分说明：" class="headerlink" title="各部分说明："></a>各部分说明：</h3><ol>
+<li><strong>Tag（字段编号 + wire type）</strong><ul>
+<li>计算方式：<code>(field_number &lt;&lt; 3) | wire_type</code></li>
+<li>字符串的 wire type 是 <code>2</code>（length-delimited）</li>
+<li>然后用 Varint 编码这个 tag</li>
+</ul>
+</li>
+<li><strong>Length</strong><ul>
+<li>表示字符串字节数（不是字符数！）</li>
+<li>使用 Varint 编码表示字符串的字节长度（UTF-8 编码后的字节数）</li>
+</ul>
+</li>
+<li><strong>Data</strong><ul>
+<li>字符串本身的内容，<strong>以 UTF-8 编码</strong>保存</li>
+<li>原样写入，没有压缩</li>
+</ul>
+</li>
+</ol>
+<h3 id="举个例子"><a href="#举个例子" class="headerlink" title="举个例子"></a>举个例子</h3><figure class="highlight protobuf"><table><tr><td class="code"><pre><span class="line"><span class="keyword">message </span><span class="title class_">Person</span> &#123;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>发送 <code>&quot;张三&quot;</code>：</p>
+<ul>
+<li>字段号：1，wire type：2 → tag &#x3D; <code>(1 &lt;&lt; 3) | 2 = 10</code> → Varint 编码为 <code>0x0A</code></li>
+<li>“张三” 的 UTF-8 编码是 6 个字节：<code>E5 BC A0 E4 B8 89</code></li>
+<li>Length &#x3D; 6 → Varint 编码为 <code>0x06</code></li>
+</ul>
+<p>最终编码为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0A 06 E5 BC A0 E4 B8 89</span><br></pre></td></tr></table></figure>
+
+<h3 id="解码过程"><a href="#解码过程" class="headerlink" title="解码过程"></a>解码过程</h3><ol>
+<li><strong>Tag</strong>：<ul>
+<li>从二进制流中读取 Varint 编码的 Tag</li>
+<li>解码为 <code>(field_number &lt;&lt; 3) | wire_type</code></li>
+</ul>
+</li>
+<li><strong>Length</strong>：<ul>
+<li>从二进制流中读取 Varint 编码的 Length</li>
+<li>解码为字符串的字节长度</li>
+</ul>
+</li>
+<li><strong>Data</strong>：<ul>
+<li>从二进制流中读取指定长度的字节</li>
+<li>解码为字符串内容</li>
+</ul>
+</li>
+</ol>
+<p>在线工具：<a href="https://protobuf-decoder.netlify.app/">https://protobuf-decoder.netlify.app/</a></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><table>
+<thead>
+<tr>
+<th>编码部分</th>
+<th>内容</th>
+<th>编码方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tag</td>
+<td>字段号 + 类型</td>
+<td>Varint</td>
+</tr>
+<tr>
+<td>Length</td>
+<td>字节长度</td>
+<td>Varint</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>UTF-8 字节流</td>
+<td>原样写入</td>
+</tr>
+</tbody></table>
+<h1 id="gRPC-深入剖析"><a href="#gRPC-深入剖析" class="headerlink" title="gRPC 深入剖析"></a>gRPC 深入剖析</h1><h2 id="gRPC-的优势"><a href="#gRPC-的优势" class="headerlink" title="gRPC 的优势"></a>gRPC 的优势</h2><ol>
+<li><strong>高性能</strong>：使用 HTTP&#x2F;2 作为传输协议，支持多路复用</li>
+<li><strong>强类型 IDL</strong>：使用 Protocol Buffers 进行接口定义和数据序列化</li>
+<li><strong>多语言支持</strong>：自动生成多种语言的客户端和服务端代码</li>
+<li><strong>双向流</strong>：支持流式处理，适用于大数据传输和实时通信</li>
+<li><strong>内置认证</strong>：提供 SSL&#x2F;TLS 集成和多种认证机制</li>
+</ol>
+<h2 id="gRPC-与-Protobuf-的协同机制"><a href="#gRPC-与-Protobuf-的协同机制" class="headerlink" title="gRPC 与 Protobuf 的协同机制"></a>gRPC 与 Protobuf 的协同机制</h2><p>gRPC 是基于 Protobuf 的高性能 RPC 框架，Protobuf 在其中既作为接口描述语言 (IDL) 又作为消息交换格式。其配合机制主要包括：</p>
+<ul>
+<li><p><strong>服务和消息定义</strong>：在 <code>.proto</code> 文件中定义服务（service）和消息（message）。例如：</p>
+<figure class="highlight protobuf"><table><tr><td class="code"><pre><span class="line"><span class="keyword">service </span><span class="title class_">Greeter</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> SayHello (HelloRequest) <span class="keyword">returns</span> (HelloReply)</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">message </span><span class="title class_">HelloRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">1</span>;</span><br><span class="line">  <span class="type">int32</span> age = <span class="number">2</span>;</span><br><span class="line">  <span class="type">float</span> height = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">message </span><span class="title class_">HelloReply</span> &#123;</span><br><span class="line">  <span class="type">string</span> message = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如上所示，通过 <code>service</code> 和 <code>rpc</code> 关键字指定可远程调用的方法及其请求&#x2F;响应类型。</p>
+</li>
+<li><p><strong>生成客户端&#x2F;服务器代码</strong>：使用 <code>protoc</code> 编译器配合 gRPC 插件从 <code>.proto</code> 生成代码。该过程会生成各语言的消息类和 RPC 接口代码，包括客户端存根（stub）和服务器端骨架。生成的服务器端代码通常包含用于注册服务的函数（如 Go 的 <code>RegisterGreeterServer</code>）。开发者在服务器实现类中填充业务逻辑，并通过调用注册函数将服务注册到 gRPC 服务器上。客户端则通过生成的存根调用服务方法，存根会将请求参数打包成Protobuf 消息并发送到服务器。</p>
+</li>
+<li><p><strong>运行时通信流程</strong>：客户端调用存根方法，本地代码被转换成 RPC 请求，通过 HTTP&#x2F;2 传输承载的二进制帧发送给服务端。服务端的 gRPC 基础设施接收请求，解码 Protobuf 消息并调用相应的服务实现方法，方法返回值再编码为 Protobuf 响应发送回客户端。整个过程对开发者透明，就像在本地调用函数一样。</p>
+</li>
+</ul>
+<h3 id="定义服务"><a href="#定义服务" class="headerlink" title="定义服务"></a>定义服务</h3><p>Protocol Buffers 不仅可以定义数据结构，还可以定义 RPC 服务：</p>
+<figure class="highlight protobuf"><table><tr><td class="code"><pre><span class="line"><span class="keyword">service </span><span class="title class_">UserService</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> GetUser(UserRequest) <span class="keyword">returns</span> (UserResponse)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> ListUsers(ListUsersRequest) <span class="keyword">returns</span> (stream UserResponse)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> UpdateUser(stream UserUpdateRequest) <span class="keyword">returns</span> (UserResponse)</span>;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> ChatWithUsers(stream ChatMessage) <span class="keyword">returns</span> (stream ChatMessage)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面例子展示了四种调用模式：</p>
+<ul>
+<li>一元 RPC：单个请求和响应</li>
+<li>服务端流式 RPC：客户端发送一个请求，服务端返回流式响应</li>
+<li>客户端流式 RPC：客户端发送流式请求，服务端返回单个响应</li>
+<li>双向流式 RPC：双方都发送消息流</li>
+</ul>
+<h2 id="gRPC-工作原理"><a href="#gRPC-工作原理" class="headerlink" title="gRPC 工作原理"></a>gRPC 工作原理</h2><h3 id="gRPC-架构"><a href="#gRPC-架构" class="headerlink" title="gRPC 架构"></a>gRPC 架构</h3><p>gRPC 的基本架构由以下几个重要组件组成：</p>
+<ol>
+<li><strong>客户端 Stub</strong>：调用方使用的桩代码，隐藏 RPC 细节</li>
+<li><strong>服务端 Skeleton</strong>：服务实现方的骨架代码</li>
+<li><strong>序列化&#x2F;反序列化层</strong>：使用 Protocol Buffers 处理数据</li>
+<li><strong>传输层</strong>：基于 HTTP&#x2F;2 协议的网络传输</li>
+</ol>
+<h3 id="gRPC-调用类型"><a href="#gRPC-调用类型" class="headerlink" title="gRPC 调用类型"></a>gRPC 调用类型</h3><p>gRPC 支持四种调用类型，满足不同场景需求：</p>
+<ol>
+<li><strong>一元 RPC(Unary RPC)</strong><ul>
+<li>客户端发送单个请求并获得单个响应</li>
+<li>类似于传统的 HTTP 请求&#x2F;响应模式</li>
+<li>适用于简单的请求处理</li>
+</ul>
+</li>
+<li><strong>服务端流式 RPC(Server Streaming RPC)</strong><ul>
+<li>客户端发送单个请求，服务端返回消息流</li>
+<li>适用于大数据传输：如下载大文件或获取大量数据</li>
+</ul>
+</li>
+<li><strong>客户端流式 RPC(Client Streaming RPC)</strong><ul>
+<li>客户端发送消息流，服务端返回单个响应</li>
+<li>适用于上传数据或实时处理：如文件上传或实时数据采集</li>
+</ul>
+</li>
+<li><strong>双向流式 RPC(Bidirectional Streaming RPC)</strong><ul>
+<li>客户端和服务端同时发送和接收消息流</li>
+<li>适用于实时双向通信：如聊天应用或实时协作</li>
+</ul>
+</li>
+</ol>
+<h1 id="使用-gRPC-构建微服务"><a href="#使用-gRPC-构建微服务" class="headerlink" title="使用 gRPC 构建微服务"></a>使用 gRPC 构建微服务</h1><p>本章将介绍如何使用 Go 语言和 gRPC 构建微服务，包括服务定义、代码生成、服务端与客户端实现，以及 gRPC 拦截器的使用。</p>
+<h2 id="gRPC-服务定义与代码生成"><a href="#gRPC-服务定义与代码生成" class="headerlink" title="gRPC 服务定义与代码生成"></a>gRPC 服务定义与代码生成</h2><h3 id="安装必要工具"><a href="#安装必要工具" class="headerlink" title="安装必要工具"></a>安装必要工具</h3><p>在使用 gRPC 前，需要安装 Protocol Buffers 编译器和 Go 语言的 gRPC 插件：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 安装protoc编译器</span></span><br><span class="line"><span class="comment"># 可从 https://github.com/protocolbuffers/protobuf/releases 下载</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装Go的protoc插件</span></span><br><span class="line">go install google.golang.org/protobuf/cmd/protoc-gen-go@latest</span><br><span class="line">go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest</span><br></pre></td></tr></table></figure>
+
+<h3 id="定义服务-1"><a href="#定义服务-1" class="headerlink" title="定义服务"></a>定义服务</h3><p>创建一个<code>.proto</code>文件，定义服务和消息结构：</p>
+<figure class="highlight protobuf"><table><tr><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> product;</span><br><span class="line"><span class="keyword">option</span> go_package = <span class="string">&quot;github.com/username/microservice/product&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 商品服务</span></span><br><span class="line"><span class="keyword">service </span><span class="title class_">ProductService</span> &#123;</span><br><span class="line">  <span class="comment">// 获取商品详情</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> GetProduct(GetProductRequest) <span class="keyword">returns</span> (ProductResponse)</span>;</span><br><span class="line">  <span class="comment">// 查询商品列表</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> ListProducts(ListProductsRequest) <span class="keyword">returns</span> (stream ProductResponse)</span>;</span><br><span class="line">  <span class="comment">// 创建商品</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> CreateProduct(CreateProductRequest) <span class="keyword">returns</span> (ProductResponse)</span>;</span><br><span class="line">  <span class="comment">// 批量更新商品</span></span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> UpdateProducts(stream UpdateProductRequest) <span class="keyword">returns</span> (UpdateProductsResponse)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取商品请求</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">GetProductRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> product_id = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 商品列表请求</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">ListProductsRequest</span> &#123;</span><br><span class="line">  <span class="type">int32</span> page_size = <span class="number">1</span>;</span><br><span class="line">  <span class="type">int32</span> page_number = <span class="number">2</span>;</span><br><span class="line">  <span class="type">string</span> category = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建商品请求</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">CreateProductRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">1</span>;</span><br><span class="line">  <span class="type">string</span> description = <span class="number">2</span>;</span><br><span class="line">  <span class="type">double</span> price = <span class="number">3</span>;</span><br><span class="line">  <span class="type">string</span> category = <span class="number">4</span>;</span><br><span class="line">  <span class="type">int32</span> stock = <span class="number">5</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新商品请求</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">UpdateProductRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> product_id = <span class="number">1</span>;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">2</span>;</span><br><span class="line">  <span class="type">string</span> description = <span class="number">3</span>;</span><br><span class="line">  <span class="type">double</span> price = <span class="number">4</span>;</span><br><span class="line">  <span class="type">int32</span> stock = <span class="number">5</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 批量更新响应</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">UpdateProductsResponse</span> &#123;</span><br><span class="line">  <span class="type">int32</span> updated_count = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">repeated</span> <span class="type">string</span> failed_ids = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 商品响应</span></span><br><span class="line"><span class="keyword">message </span><span class="title class_">ProductResponse</span> &#123;</span><br><span class="line">  <span class="type">string</span> id = <span class="number">1</span>;</span><br><span class="line">  <span class="type">string</span> name = <span class="number">2</span>;</span><br><span class="line">  <span class="type">string</span> description = <span class="number">3</span>;</span><br><span class="line">  <span class="type">double</span> price = <span class="number">4</span>;</span><br><span class="line">  <span class="type">string</span> category = <span class="number">5</span>;</span><br><span class="line">  <span class="type">int32</span> stock = <span class="number">6</span>;</span><br><span class="line">  <span class="type">string</span> created_at = <span class="number">7</span>;</span><br><span class="line">  <span class="type">string</span> updated_at = <span class="number">8</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="生成代码"><a href="#生成代码" class="headerlink" title="生成代码"></a>生成代码</h3><p>使用以下命令生成 Go 代码：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">protoc --go_out=. --go-grpc_out=. product.proto</span><br></pre></td></tr></table></figure>
+
+<p>这将生成两个文件：</p>
+<ul>
+<li><code>product.pb.go</code>: 包含所有消息类型的 Go 结构体</li>
+<li><code>product_grpc.pb.go</code>: 包含 gRPC 客户端和服务端接口</li>
+</ul>
+<h2 id="实现-gRPC-服务端"><a href="#实现-gRPC-服务端" class="headerlink" title="实现 gRPC 服务端"></a>实现 gRPC 服务端</h2><h3 id="基本服务实现"><a href="#基本服务实现" class="headerlink" title="基本服务实现"></a>基本服务实现</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	pb <span class="string">&quot;github.com/username/microservice/product&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc/codes&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc/status&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span> &#123;</span><br><span class="line">	pb.UnimplementedProductServiceServer</span><br><span class="line">	products <span class="keyword">map</span>[<span class="type">string</span>]*pb.ProductResponse <span class="comment">// 简化示例，实际应使用数据库</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现GetProduct方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *server)</span></span> GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.ProductResponse, <span class="type">error</span>) &#123;</span><br><span class="line">	<span class="keyword">if</span> product, exists := s.products[req.ProductId]; exists &#123;</span><br><span class="line">		<span class="keyword">return</span> product, <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span>, status.Errorf(codes.NotFound, <span class="string">&quot;产品ID %s 不存在&quot;</span>, req.ProductId)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现ListProducts方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *server)</span></span> ListProducts(req *pb.ListProductsRequest, stream pb.ProductService_ListProductsServer) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, product := <span class="keyword">range</span> s.products &#123;</span><br><span class="line">		<span class="comment">// 如果指定了分类，则过滤</span></span><br><span class="line">		<span class="keyword">if</span> req.Category != <span class="string">&quot;&quot;</span> &amp;&amp; product.Category != req.Category &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 发送产品到流</span></span><br><span class="line">		<span class="keyword">if</span> err := stream.Send(product); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现CreateProduct方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *server)</span></span> CreateProduct(ctx context.Context, req *pb.CreateProductRequest) (*pb.ProductResponse, <span class="type">error</span>) &#123;</span><br><span class="line">	<span class="comment">// 生成ID (简化示例)</span></span><br><span class="line">	id := fmt.Sprintf(<span class="string">&quot;prod-%d&quot;</span>, time.Now().Unix())</span><br><span class="line"></span><br><span class="line">	product := &amp;pb.ProductResponse&#123;</span><br><span class="line">		Id:          id,</span><br><span class="line">		Name:        req.Name,</span><br><span class="line">		Description: req.Description,</span><br><span class="line">		Price:       req.Price,</span><br><span class="line">		Category:    req.Category,</span><br><span class="line">		Stock:       req.Stock,</span><br><span class="line">		CreatedAt:   time.Now().Format(time.RFC3339),</span><br><span class="line">		UpdatedAt:   time.Now().Format(time.RFC3339),</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	s.products[id] = product</span><br><span class="line">	<span class="keyword">return</span> product, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实现UpdateProducts方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *server)</span></span> UpdateProducts(stream pb.ProductService_UpdateProductsServer) <span class="type">error</span> &#123;</span><br><span class="line">	updatedCount := <span class="number">0</span></span><br><span class="line">	failedIds := []<span class="type">string</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		req, err := stream.Recv()</span><br><span class="line">		<span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">			<span class="comment">// 完成接收，返回结果</span></span><br><span class="line">			<span class="keyword">return</span> stream.SendAndClose(&amp;pb.UpdateProductsResponse&#123;</span><br><span class="line">				UpdatedCount: <span class="type">int32</span>(updatedCount),</span><br><span class="line">				FailedIds:    failedIds,</span><br><span class="line">			&#125;)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 尝试更新产品</span></span><br><span class="line">		<span class="keyword">if</span> product, exists := s.products[req.ProductId]; exists &#123;</span><br><span class="line">			product.Name = req.Name</span><br><span class="line">			product.Description = req.Description</span><br><span class="line">			product.Price = req.Price</span><br><span class="line">			product.Stock = req.Stock</span><br><span class="line">			product.UpdatedAt = time.Now().Format(time.RFC3339)</span><br><span class="line">			updatedCount++</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			failedIds = <span class="built_in">append</span>(failedIds, req.ProductId)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lis, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:50051&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;监听端口失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	s := grpc.NewServer()</span><br><span class="line">	productServer := &amp;server&#123;</span><br><span class="line">		products: <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="type">string</span>]*pb.ProductResponse),</span><br><span class="line">	&#125;</span><br><span class="line">	pb.RegisterProductServiceServer(s, productServer)</span><br><span class="line"></span><br><span class="line">	log.Println(<span class="string">&quot;gRPC服务器已启动，监听端口50051...&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err := s.Serve(lis); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;服务运行失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-TLS-安全认证"><a href="#添加-TLS-安全认证" class="headerlink" title="添加 TLS 安全认证"></a>添加 TLS 安全认证</h3><p>在生产环境中，应使用 TLS 加密通信：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 加载TLS证书</span></span><br><span class="line">	creds, err := credentials.NewServerTLSFromFile(<span class="string">&quot;server.crt&quot;</span>, <span class="string">&quot;server.key&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;加载TLS证书失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建安全的gRPC服务器</span></span><br><span class="line">	s := grpc.NewServer(grpc.Creds(creds))</span><br><span class="line">	<span class="comment">// ... 其他代码相同</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="实现-gRPC-客户端"><a href="#实现-gRPC-客户端" class="headerlink" title="实现 gRPC 客户端"></a>实现 gRPC 客户端</h2><h3 id="基本客户端实现"><a href="#基本客户端实现" class="headerlink" title="基本客户端实现"></a>基本客户端实现</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;io&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	pb <span class="string">&quot;github.com/username/microservice/product&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc/credentials/insecure&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 建立连接</span></span><br><span class="line">	conn, err := grpc.Dial(<span class="string">&quot;localhost:50051&quot;</span>, grpc.WithTransportCredentials(insecure.NewCredentials()))</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;无法连接服务器: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建客户端</span></span><br><span class="line">	client := pb.NewProductServiceClient(conn)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 设置上下文</span></span><br><span class="line">	ctx, cancel := context.WithTimeout(context.Background(), <span class="number">10</span>*time.Second)</span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建商品</span></span><br><span class="line">	createResp, err := client.CreateProduct(ctx, &amp;pb.CreateProductRequest&#123;</span><br><span class="line">		Name:        <span class="string">&quot;Go编程实战&quot;</span>,</span><br><span class="line">		Description: <span class="string">&quot;学习Go语言的最佳实践指南&quot;</span>,</span><br><span class="line">		Price:       <span class="number">59.9</span>,</span><br><span class="line">		Category:    <span class="string">&quot;书籍&quot;</span>,</span><br><span class="line">		Stock:       <span class="number">100</span>,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;创建商品失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">&quot;创建的商品: %v&quot;</span>, createResp)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 获取商品</span></span><br><span class="line">	getResp, err := client.GetProduct(ctx, &amp;pb.GetProductRequest&#123;</span><br><span class="line">		ProductId: createResp.Id,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;获取商品失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">&quot;获取到的商品: %v&quot;</span>, getResp)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 列出商品（使用流）</span></span><br><span class="line">	stream, err := client.ListProducts(ctx, &amp;pb.ListProductsRequest&#123;</span><br><span class="line">		Category: <span class="string">&quot;书籍&quot;</span>,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;获取商品列表失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		product, err := stream.Recv()</span><br><span class="line">		<span class="keyword">if</span> err == io.EOF &#123;</span><br><span class="line">			<span class="keyword">break</span> <span class="comment">// 流结束</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">&quot;接收商品流失败: %v&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		log.Printf(<span class="string">&quot;列表中商品: %v&quot;</span>, product)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加-TLS-安全连接"><a href="#添加-TLS-安全连接" class="headerlink" title="添加 TLS 安全连接"></a>添加 TLS 安全连接</h3><p>生产环境中应使用 TLS：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 加载TLS证书</span></span><br><span class="line">	creds, err := credentials.NewClientTLSFromFile(<span class="string">&quot;server.crt&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;加载TLS证书失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 使用TLS连接</span></span><br><span class="line">	conn, err := grpc.Dial(<span class="string">&quot;localhost:50051&quot;</span>, grpc.WithTransportCredentials(creds))</span><br><span class="line">	<span class="comment">// ... 其他代码相同</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="处理客户端流式调用"><a href="#处理客户端流式调用" class="headerlink" title="处理客户端流式调用"></a>处理客户端流式调用</h3><p>更新多个商品的示例：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">updateProducts</span><span class="params">(client pb.ProductServiceClient, ctx context.Context)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 创建客户端流</span></span><br><span class="line">	stream, err := client.UpdateProducts(ctx)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;创建更新流失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 发送多个更新请求</span></span><br><span class="line">	<span class="keyword">for</span> i, prodId := <span class="keyword">range</span> []<span class="type">string</span>&#123;<span class="string">&quot;prod-1&quot;</span>, <span class="string">&quot;prod-2&quot;</span>, <span class="string">&quot;prod-3&quot;</span>&#125; &#123;</span><br><span class="line">		err := stream.Send(&amp;pb.UpdateProductRequest&#123;</span><br><span class="line">			ProductId:   prodId,</span><br><span class="line">			Name:        fmt.Sprintf(<span class="string">&quot;更新产品 %d&quot;</span>, i),</span><br><span class="line">			Description: <span class="string">&quot;产品已更新&quot;</span>,</span><br><span class="line">			Price:       <span class="number">99.9</span> + <span class="type">float64</span>(i*<span class="number">10</span>),</span><br><span class="line">			Stock:       <span class="number">50</span> - i*<span class="number">5</span>,</span><br><span class="line">		&#125;)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Fatalf(<span class="string">&quot;发送更新失败: %v&quot;</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		time.Sleep(<span class="number">100</span> * time.Millisecond) <span class="comment">// 模拟处理时间</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 关闭发送并获取结果</span></span><br><span class="line">	resp, err := stream.CloseAndRecv()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;接收更新结果失败: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	log.Printf(<span class="string">&quot;更新结果: 成功 %d, 失败 %v&quot;</span>, resp.UpdatedCount, resp.FailedIds)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>后端开发</category>
