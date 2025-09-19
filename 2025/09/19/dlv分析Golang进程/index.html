@@ -19,28 +19,28 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"jianingdai.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"menu_item":"fadeIn","post_block":"fadeIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"fadeIn","sidebar":"fadeIn"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="这是一个基于 Go 语言开发的网络监控命令行工具，旨在帮助用户监控指定的目标（如网站或 IP 地址）的可用性和响应时间。通过该工具，用户可以方便地添加、删除监控目标，启动监控任务，并生成监控报告。">
+    <meta name="description" content="使用 dlv（Delve）分析 Golang 进程的 CPU 占用高问题可以帮助开发人员深入理解代码运行时的行为，找出性能瓶颈或问题。dlv 是 Go 语言中的调试器，可以用来调试、分析运行中的进程。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="网络监控命令行工具">
-<meta property="og:url" content="http://jianingdai.github.io/2025/04/11/%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:title" content="dlv分析Golang进程">
+<meta property="og:url" content="http://jianingdai.github.io/2025/09/19/dlv%E5%88%86%E6%9E%90Golang%E8%BF%9B%E7%A8%8B/index.html">
 <meta property="og:site_name" content="摸鱼日记">
-<meta property="og:description" content="这是一个基于 Go 语言开发的网络监控命令行工具，旨在帮助用户监控指定的目标（如网站或 IP 地址）的可用性和响应时间。通过该工具，用户可以方便地添加、删除监控目标，启动监控任务，并生成监控报告。">
+<meta property="og:description" content="使用 dlv（Delve）分析 Golang 进程的 CPU 占用高问题可以帮助开发人员深入理解代码运行时的行为，找出性能瓶颈或问题。dlv 是 Go 语言中的调试器，可以用来调试、分析运行中的进程。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-04-11T09:59:58.000Z">
-<meta property="article:modified_time" content="2025-07-11T10:03:50.453Z">
+<meta property="article:published_time" content="2025-09-19T02:39:12.000Z">
+<meta property="article:modified_time" content="2025-09-19T02:42:41.782Z">
 <meta property="article:author" content="jianing dai">
 <meta property="article:tag" content="后端开发">
 <meta property="article:tag" content="Golang">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://jianingdai.github.io/2025/04/11/%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/">
+<link rel="canonical" href="http://jianingdai.github.io/2025/09/19/dlv%E5%88%86%E6%9E%90Golang%E8%BF%9B%E7%A8%8B/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jianingdai.github.io/2025/04/11/%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/","path":"2025/04/11/网络监控命令行工具/","title":"网络监控命令行工具"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jianingdai.github.io/2025/09/19/dlv%E5%88%86%E6%9E%90Golang%E8%BF%9B%E7%A8%8B/","path":"2025/09/19/dlv分析Golang进程/","title":"dlv分析Golang进程"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>网络监控命令行工具 | 摸鱼日记</title>
+<title>dlv分析Golang进程 | 摸鱼日记</title>
   
 
   <script src="/js/third-party/analytics/baidu-analytics.js"></script>
@@ -141,7 +141,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7"><span class="nav-text">网络监控命令行工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B"><span class="nav-text">项目简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84"><span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="nav-text">核心功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92"><span class="nav-text">开发计划</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-dlv-%E5%88%86%E6%9E%90-Go-%E8%BF%9B%E7%A8%8B-CPU-%E5%8D%A0%E7%94%A8%E9%AB%98%E9%97%AE%E9%A2%98%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="nav-text">使用 dlv 分析 Go 进程 CPU 占用高问题的步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%A1%AE%E8%AE%A4-CPU-%E5%8D%A0%E7%94%A8%E9%AB%98%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="nav-text">1. 确认 CPU 占用高的进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8-dlv-%E9%99%84%E5%8A%A0%E5%88%B0%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%9A%84%E8%BF%9B%E7%A8%8B"><span class="nav-text">2. 使用 dlv 附加到运行中的进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%9F%A5%E7%9C%8B-Goroutine"><span class="nav-text">3. 查看 Goroutine</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%A3%80%E6%9F%A5-Goroutine-%E7%9A%84%E5%A0%86%E6%A0%88"><span class="nav-text">4. 检查 Goroutine 的堆栈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E6%89%A7%E8%A1%8C%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-text">5. 查看当前执行的位置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-%E5%88%86%E6%9E%90-CPU-Profiling"><span class="nav-text">6. 分析 CPU Profiling</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-%E9%80%9A%E8%BF%87-trace-%E5%88%86%E6%9E%90%E6%9B%B4%E5%A4%9A%E7%BB%86%E8%8A%82"><span class="nav-text">7. 通过 trace 分析更多细节</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-text">总结</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -202,7 +202,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://jianingdai.github.io/2025/04/11/%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/">
+    <link itemprop="mainEntityOfPage" href="http://jianingdai.github.io/2025/09/19/dlv%E5%88%86%E6%9E%90Golang%E8%BF%9B%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/537.jpg">
@@ -215,12 +215,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="网络监控命令行工具 | 摸鱼日记">
-      <meta itemprop="description" content="这是一个基于 Go 语言开发的网络监控命令行工具，旨在帮助用户监控指定的目标（如网站或 IP 地址）的可用性和响应时间。通过该工具，用户可以方便地添加、删除监控目标，启动监控任务，并生成监控报告。">
+      <meta itemprop="name" content="dlv分析Golang进程 | 摸鱼日记">
+      <meta itemprop="description" content="使用 dlv（Delve）分析 Golang 进程的 CPU 占用高问题可以帮助开发人员深入理解代码运行时的行为，找出性能瓶颈或问题。dlv 是 Go 语言中的调试器，可以用来调试、分析运行中的进程。">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          网络监控命令行工具
+          dlv分析Golang进程
         </h1>
 
         <div class="post-meta-container">
@@ -230,15 +230,9 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">提交于</span>
+      
 
-      <time title="创建时间：2025-04-11 17:59:58" itemprop="dateCreated datePublished" datetime="2025-04-11T17:59:58+08:00">2025-04-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-07-11 18:03:50" itemprop="dateModified" datetime="2025-07-11T18:03:50+08:00">2025-07-11</time>
+      <time title="创建时间：2025-09-19 10:39:12 / 修改时间：10:42:41" itemprop="dateCreated datePublished" datetime="2025-09-19T10:39:12+08:00">2025-09-19</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -270,52 +264,88 @@
       </span>
       <span class="post-meta-item-text">Disqus：</span>
     
-    <a title="disqus" href="/2025/04/11/%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/#disqus_thread" itemprop="discussionUrl">
-      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2025/04/11/网络监控命令行工具/" itemprop="commentCount"></span>
+    <a title="disqus" href="/2025/09/19/dlv%E5%88%86%E6%9E%90Golang%E8%BF%9B%E7%A8%8B/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2025/09/19/dlv分析Golang进程/" itemprop="commentCount"></span>
     </a>
   </span>
   
   
 </div>
 
-            <div class="post-description">这是一个基于 Go 语言开发的网络监控命令行工具，旨在帮助用户监控指定的目标（如网站或 IP 地址）的可用性和响应时间。通过该工具，用户可以方便地添加、删除监控目标，启动监控任务，并生成监控报告。</div>
+            <div class="post-description">使用 dlv（Delve）分析 Golang 进程的 CPU 占用高问题可以帮助开发人员深入理解代码运行时的行为，找出性能瓶颈或问题。dlv 是 Go 语言中的调试器，可以用来调试、分析运行中的进程。</div>
         </div>
       </header>
 
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="网络监控命令行工具"><a href="#网络监控命令行工具" class="headerlink" title="网络监控命令行工具"></a>网络监控命令行工具</h1><p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/jianingdai/network-monitor">https://github.com/jianingdai/network-monitor</a></p>
-<h2 id="项目简介"><a href="#项目简介" class="headerlink" title="项目简介"></a>项目简介</h2><p>这是一个基于 Go 语言开发的网络监控命令行工具，旨在帮助用户监控指定的目标（如网站或 IP 地址）的可用性和响应时间。通过该工具，用户可以方便地添加、删除监控目标，启动监控任务，并生成监控报告。</p>
-<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">network-monitor/</span><br><span class="line">├── cmd/         # 命令行定义</span><br><span class="line">├── core/        # 核心业务逻辑</span><br><span class="line">├── models/      # 数据模型</span><br><span class="line">├── utils/       # 通用工具</span><br><span class="line">├── config/      # 配置文件</span><br><span class="line">├── tests/       # 测试目录</span><br><span class="line">├── main.go      # 程序入口</span><br></pre></td></tr></table></figure>
+    <div class="post-body" itemprop="articleBody"><h3 id="使用-dlv-分析-Go-进程-CPU-占用高问题的步骤"><a href="#使用-dlv-分析-Go-进程-CPU-占用高问题的步骤" class="headerlink" title="使用 dlv 分析 Go 进程 CPU 占用高问题的步骤"></a>使用 <code>dlv</code> 分析 Go 进程 CPU 占用高问题的步骤</h3><h4 id="1-确认-CPU-占用高的进程"><a href="#1-确认-CPU-占用高的进程" class="headerlink" title="1. 确认 CPU 占用高的进程"></a>1. <strong>确认 CPU 占用高的进程</strong></h4><p>首先，你需要找到 CPU 占用高的进程。在 Linux 环境下，可以使用 <code>top</code> 或 <code>htop</code> 命令来查看系统中各个进程的 CPU 使用情况。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top</span><br></pre></td></tr></table></figure>
 
-<h2 id="核心功能"><a href="#核心功能" class="headerlink" title="核心功能"></a>核心功能</h2><ol>
-<li><strong>添加监控目标</strong>：通过命令行添加需要监控的网站或 IP 地址。</li>
-<li><strong>删除监控目标</strong>：移除不再需要监控的目标。</li>
-<li><strong>列出监控目标</strong>：查看当前所有监控目标。</li>
-<li><strong>启动监控任务</strong>：并发监控所有目标的可用性和响应时间。</li>
-<li><strong>生成监控报告</strong>：统计监控结果，生成详细的报告。</li>
-</ol>
-<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><ol>
-<li><p>确保已安装 Go 开发环境。</p>
-</li>
-<li><p>克隆项目到本地：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> &lt;repository-url&gt;</span><br><span class="line"><span class="built_in">cd</span> network-monitor</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go run main.go add -n <span class="string">&quot;Google&quot;</span> -u <span class="string">&quot;https://google.com&quot;</span></span><br><span class="line">go run main.go start</span><br><span class="line">go run main.go report</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>或者运行以下命令</p>
-</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go build .</span><br><span class="line">network-mintor.exe [<span class="built_in">command</span>]</span><br></pre></td></tr></table></figure>
 
-<p>（先构建出监控工具然后就可以带上参数使用监控工具了）</p>
-<h2 id="开发计划"><a href="#开发计划" class="headerlink" title="开发计划"></a>开发计划</h2><ul>
-<li>支持多种检查方式（如 HTTP、Ping、DNS）。</li>
-<li>集成报警功能（如邮件或短信通知）。</li>
-<li>提供 Web 界面，展示监控数据。</li>
-</ul>
+
+<p>通过 <code>top</code>，你可以找到 Go 程序的进程 ID（PID）。</p>
+<h4 id="2-使用-dlv-附加到运行中的进程"><a href="#2-使用-dlv-附加到运行中的进程" class="headerlink" title="2. 使用 dlv 附加到运行中的进程"></a>2. <strong>使用 <code>dlv</code> 附加到运行中的进程</strong></h4><p>当找到占用 CPU 高的进程后，可以通过 <code>dlv</code> 附加到正在运行的 Go 进程。假设目标进程的 PID 为 <code>12345</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dlv attach 12345</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>dlv attach</code> 会暂停该进程并进入调试模式。进入调试模式后，你可以查看进程的运行状态、查看当前的 Goroutine、函数调用栈等信息。</p>
+<h4 id="3-查看-Goroutine"><a href="#3-查看-Goroutine" class="headerlink" title="3. 查看 Goroutine"></a>3. <strong>查看 Goroutine</strong></h4><p>使用 <code>dlv</code>，你可以查看当前所有的 Goroutine，检查是否有 Goroutine 堆积或死锁。运行以下命令来查看所有 Goroutine 的状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goroutines</span><br></pre></td></tr></table></figure>
+
+
+
+<p>你会看到当前所有 Goroutine 的列表，带有每个 Goroutine 的 ID 和执行中的函数信息。如果某些 Goroutine 在某个点停滞不前或有大量 Goroutine 堆积，这可能是导致高 CPU 使用的原因。</p>
+<h4 id="4-检查-Goroutine-的堆栈"><a href="#4-检查-Goroutine-的堆栈" class="headerlink" title="4. 检查 Goroutine 的堆栈"></a>4. <strong>检查 Goroutine 的堆栈</strong></h4><p>对于特定的 Goroutine，可以进一步查看其调用栈，确认它正在执行的代码。可以通过以下命令查看某个 Goroutine 的调用栈：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goroutine &lt;Goroutine_ID&gt; stack</span><br></pre></td></tr></table></figure>
+
+
+
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goroutine 1 stack</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这会显示该 Goroutine 的调用栈，可以帮助你找出哪部分代码可能导致高 CPU 占用。</p>
+<h4 id="5-查看当前执行的位置"><a href="#5-查看当前执行的位置" class="headerlink" title="5. 查看当前执行的位置"></a>5. <strong>查看当前执行的位置</strong></h4><p>你还可以检查当前进程正在执行的代码，查看 CPU 消耗的具体位置。通过 <code>break</code> 设置断点，在特定的代码行停止执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">break main.go:20</span><br></pre></td></tr></table></figure>
+
+
+
+<p>然后使用 <code>continue</code> 命令继续执行程序，程序将在达到该断点时暂停，这样可以了解程序在特定代码路径上的运行情况。</p>
+<h4 id="6-分析-CPU-Profiling"><a href="#6-分析-CPU-Profiling" class="headerlink" title="6. 分析 CPU Profiling"></a>6. <strong>分析 CPU Profiling</strong></h4><p>对于更深层次的 CPU 占用问题分析，可以利用 <code>pprof</code> 工具生成 CPU 性能报告。使用 <code>runtime/pprof</code> 包，可以通过代码生成 CPU profile 文件，并使用 <code>go tool pprof</code> 分析。</p>
+<p>首先，在程序中添加以下代码来记录 CPU profile：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import (</span><br><span class="line">    &quot;os&quot;</span><br><span class="line">    &quot;runtime/pprof&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    f, _ := os.Create(&quot;cpu.prof&quot;)</span><br><span class="line">    pprof.StartCPUProfile(f)</span><br><span class="line">    defer pprof.StopCPUProfile()</span><br><span class="line">    // your code</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>运行程序后，使用 <code>go tool pprof</code> 来分析 <code>cpu.prof</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go tool pprof cpu.prof</span><br></pre></td></tr></table></figure>
+
+
+
+<p>进入 <code>pprof</code> 后，可以使用 <code>top</code>、<code>list</code> 等命令来查看哪些函数占用了最多的 CPU 时间。</p>
+<h4 id="7-通过-trace-分析更多细节"><a href="#7-通过-trace-分析更多细节" class="headerlink" title="7. 通过 trace 分析更多细节"></a>7. <strong>通过 <code>trace</code> 分析更多细节</strong></h4><p>除了 <code>dlv</code> 和 <code>pprof</code>，还可以使用 Go 提供的 <code>trace</code> 工具来捕获更多的运行时信息。首先，修改代码以捕获 trace：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">import (</span><br><span class="line">    &quot;os&quot;</span><br><span class="line">    &quot;runtime/trace&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    f, _ := os.Create(&quot;trace.out&quot;)</span><br><span class="line">    trace.Start(f)</span><br><span class="line">    defer trace.Stop()</span><br><span class="line">    // your code</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>然后使用 <code>go tool trace</code> 查看 trace 文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go tool trace trace.out</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>trace</code> 工具能展示更多的调度、Goroutine 切换、GC 事件等，帮助更全面地分析程序性能。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>使用 <code>dlv</code> 调试 Go 进程 CPU 占用高的问题，可以从以下几方面着手：</p>
+<ol>
+<li><strong>确认高 CPU 使用的进程</strong>，使用 <code>top</code> 查找进程。</li>
+<li><strong>附加到进程</strong>，使用 <code>dlv attach</code> 进入调试模式。</li>
+<li><strong>查看 Goroutine 状态</strong>，检查是否有 Goroutine 堆积或执行异常。</li>
+<li><strong>分析调用栈</strong>，定位消耗 CPU 资源的代码路径。</li>
+<li>使用 <code>pprof</code> 和 <code>trace</code> 进行更详细的性能分析。</li>
+</ol>
+<p>通过这些步骤，可以有效找到并解决 Go 应用中的性能瓶颈问题。</p>
 
     </div>
 
@@ -351,14 +381,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2025/03/09/go%E8%AF%AD%E8%A8%80%E7%BC%96%E5%86%99%E7%9A%84%E6%96%87%E4%BB%B6%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="prev" title="go语言编写的文件服务器">
-                  <i class="fa fa-angle-left"></i> go语言编写的文件服务器
+                <a href="/2025/09/18/HTTP-Client%E5%A4%A7%E9%87%8F%E9%95%BF%E8%BF%9E%E6%8E%A5%E4%BF%9D%E6%8C%81/" rel="prev" title="HTTP_Client大量长连接保持">
+                  <i class="fa fa-angle-left"></i> HTTP_Client大量长连接保持
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2025/07/15/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%BC%93%E5%AD%98%E7%B3%BB%E7%BB%9F/" rel="next" title="高并发缓存系统">
-                  高并发缓存系统 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
