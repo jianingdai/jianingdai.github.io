@@ -22,7 +22,7 @@
     <meta name="description" content="Go 语言中的读写锁（sync.RWMutex）是一种同步原语，用于控制多个 Goroutine 对共享资源的并发访问。读写锁允许多个 Goroutine 同时进行读操作，但在写操作进行时，所有其他 Goroutine（包括读操作和写操作）都被阻塞。理解读写锁的实现及底层原理有助于高效地使用它。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="读写锁的实现及底层原理">
-<meta property="og:url" content="http://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:url" content="https://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="摸鱼日记">
 <meta property="og:description" content="Go 语言中的读写锁（sync.RWMutex）是一种同步原语，用于控制多个 Goroutine 对共享资源的并发访问。读写锁允许多个 Goroutine 同时进行读操作，但在写操作进行时，所有其他 Goroutine（包括读操作和写操作）都被阻塞。理解读写锁的实现及底层原理有助于高效地使用它。">
 <meta property="og:locale" content="zh_CN">
@@ -34,10 +34,10 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
+<link rel="canonical" href="https://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/","path":"2025/09/19/读写锁的实现及底层原理/","title":"读写锁的实现及底层原理"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/","path":"2025/09/19/读写锁的实现及底层原理/","title":"读写锁的实现及底层原理"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>读写锁的实现及底层原理 | 摸鱼日记</title>
@@ -202,7 +202,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="https://jianingdai.github.io/2025/09/19/%E8%AF%BB%E5%86%99%E9%94%81%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8F%8A%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/537.jpg">
